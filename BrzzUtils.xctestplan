@@ -1,0 +1,33 @@
+{
+  "configurations" : [
+    {
+      "id" : "C66C9138-D154-410F-85DC-FE77A1DA4635",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "codeCoverage" : false
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BrzzTestUtilsTests",
+        "name" : "BrzzTestUtilsTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BrzzUtilsTests",
+        "name" : "BrzzUtilsTests"
+      }
+    }
+  ],
+  "version" : 1
+}
