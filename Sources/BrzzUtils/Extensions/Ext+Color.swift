@@ -3,9 +3,6 @@ import SwiftUI
 
 extension Color {
 	public init?(hex: String) {
-		@Dependency(\.logger)
-		var logger
-		
 		let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
 		var int: UInt64 = 0
 		
