@@ -2,11 +2,11 @@ import Dependencies
 import SwiftUI
 
 extension Color {
-	public init?(hex: String) {
-		let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+	public init?(hex: String?) {
 		var int: UInt64 = 0
 		
-		guard Scanner(string: hex).scanHexInt64(&int) else {
+		guard let hex = hex?.trimmingCharacters(in: CharacterSet.alphanumerics.inverted),
+					Scanner(string: hex).scanHexInt64(&int) else {
 			return nil
 		}
 		
