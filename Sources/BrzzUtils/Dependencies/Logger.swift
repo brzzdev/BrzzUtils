@@ -59,6 +59,13 @@ public final class Logger: Sendable {
 		log(level: .error, message, fileID: fileID)
 	}
 	
+	public static func error(
+		_ error: Error,
+		fileID: StaticString = #fileID
+	) {
+		log(level: .error, error.localizedDescription, fileID: fileID)
+	}
+	
 	public static func fault(
 		_ message: String,
 		fileID: StaticString = #fileID
