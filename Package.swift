@@ -20,9 +20,13 @@ let package = Package(
 	],
 	dependencies: [
 		.package(
+			url: "https://github.com/evgenyneu/keychain-swift.git",
+			from: "20.0.0"
+		),
+		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture.git",
 			from: "1.0.0"
-		)
+		),
 	],
 	targets: [
 		.target(
@@ -44,6 +48,10 @@ let package = Package(
 				.product(
 					name: "ComposableArchitecture",
 					package: "swift-composable-architecture"
+				),
+				.product(
+					name: "KeychainSwift",
+					package: "keychain-swift"
 				),
 			]
 		),
