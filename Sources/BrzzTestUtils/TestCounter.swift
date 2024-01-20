@@ -17,7 +17,12 @@ extension TestCounter {
 		file: StaticString = #file,
 		line: UInt = #line
 	) {
-		XCTAssertEqual(self.value, value)
+		XCTAssertEqual(
+			self.value,
+			value,
+			file: file,
+			line: line
+		)
 	}
 	
 	/// Decreases the counter safely by 1.
