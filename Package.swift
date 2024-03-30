@@ -21,7 +21,7 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/evgenyneu/keychain-swift",
-			from: "20.0.0"
+			from: "21.0.0"
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture",
