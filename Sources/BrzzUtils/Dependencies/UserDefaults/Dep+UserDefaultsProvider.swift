@@ -10,9 +10,9 @@ extension DependencyValues {
 }
 
 extension UserDefaults: DependencyKey, @unchecked Sendable {
-	public static var liveValue = UserDefaults.standard
+	public static let liveValue = UserDefaults.standard
 	
-	public static var testValue = mock
+	public static let testValue = mock
 	
 	public static let mock = MockUserDefaults() as UserDefaults
 }

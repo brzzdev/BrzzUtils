@@ -48,7 +48,7 @@ extension UserDefaults.Dependency: DependencyKey {
 		)
 	}()
 	
-	public static var testValue = Self()
+	public static let testValue = Self()
 	
 	public static let noop = Self { _ in
 		false
