@@ -103,6 +103,48 @@ public struct BrzzSharedKeychainData: PersistenceKey, Hashable {
 	}
 }
 
+public struct BrzzSharedKeychainInt: PersistenceKey, Hashable {
+	public typealias Value = Int?
+	
+	private let key: String
+	@Dependency(\.keychain)
+	private var keychain
+	
+	public init(_ key: String) {
+		self.key = key
+	}
+	
+	public func save(_ value: Value) {
+		guard let data = encode(value) else { return }
+		keychain.setData(data, key: key)
+	}
+	
+	public func load(initialValue: Value?) -> Value? {
+		guard 
+			let data = keychain.getData(key: key),
+			let number = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSNumber.self, from: data) else {
+			keychain.setData(encode(initialValue ?? nil), key: key)
+			return initialValue
+		}
+		
+		return number.intValue
+	}
+	
+	private func encode(_ value: Value) -> Data? {
+		guard let value else { return nil }
+		return try? NSKeyedArchiver.archivedData(withRootObject: NSNumber(value: value), requiringSecureCoding: true)
+	}
+	
+	public static func == (lhs: BrzzSharedKeychainInt, rhs: BrzzSharedKeychainInt) -> Bool {
+		lhs.key == rhs.key && lhs.keychain == rhs.keychain
+	}
+	
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(key)
+		hasher.combine(keychain)
+	}
+}
+
 public struct BrzzSharedKeychainString: PersistenceKey, Hashable {
 	public typealias Value = String?
 	
