@@ -16,14 +16,6 @@
       "parallelizable" : true,
       "target" : {
         "containerPath" : "container:",
-        "identifier" : "BrzzTestUtilsTests",
-        "name" : "BrzzTestUtilsTests"
-      }
-    },
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:",
         "identifier" : "BrzzUtilsTests",
         "name" : "BrzzUtilsTests"
       }

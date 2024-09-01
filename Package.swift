@@ -14,9 +14,6 @@ let package = Package(
 		.library(
 			name: "BrzzUtils",
 			targets: ["BrzzUtils"]),
-		.library(
-			name: "BrzzTestUtils",
-			targets: ["BrzzTestUtils"]),
 	],
 	dependencies: [
 		.package(
@@ -29,15 +26,6 @@ let package = Package(
 		),
 	],
 	targets: [
-		.target(
-			name: "BrzzTestUtils",
-			dependencies: [
-				.product(
-					name: "ComposableArchitecture",
-					package: "swift-composable-architecture"
-				),
-			]
-		),
 		.target(
 			name: "BrzzUtils",
 			dependencies: [
