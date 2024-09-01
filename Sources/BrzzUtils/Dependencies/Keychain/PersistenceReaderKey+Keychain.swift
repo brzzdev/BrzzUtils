@@ -16,7 +16,7 @@ public struct KeychainKey<Value: Codable & Equatable>: PersistenceKey, Hashable 
 	}
 	
 	public func save(_ value: Value) {
-		guard let data = PropertyListEncoder.safeEncode(value) else { return }
+		guard let data = JSONEncoder.safeEncode(value) else { return }
 		if keychain.setData(data, key: key) {
 			didSave.send(value)
 		}
@@ -25,7 +25,7 @@ public struct KeychainKey<Value: Codable & Equatable>: PersistenceKey, Hashable 
 	public func load(initialValue: Value?) -> Value? {
 		guard let value = keychain.getData(key: key) else {
 			if let initialValue,
-				 let value = PropertyListEncoder.safeEncode(initialValue) {
+				 let value = JSONEncoder.safeEncode(initialValue) {
 				if keychain.setData(value, key: key) {
 					didSave.send(initialValue)
 				}
@@ -37,7 +37,7 @@ public struct KeychainKey<Value: Codable & Equatable>: PersistenceKey, Hashable 
 			return initialValue
 		}
 		
-		return PropertyListDecoder.safeDecode(value)
+		return JSONDecoder.safeDecode(value)
 	}
 	
 	public func subscribe(
