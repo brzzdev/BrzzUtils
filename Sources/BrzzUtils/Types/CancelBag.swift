@@ -64,7 +64,7 @@ public final class CancelBag: Sendable {
 // MARK: - AnyCancellable + Sendable
 
 /// Extension to `AnyCancellable` class to easily store an `AnyCancellable` instance to a `CancelBag`.
-extension AnyCancellable: @unchecked Sendable {
+extension AnyCancellable: @unchecked @retroactive Sendable {
 	/// Stores `AnyCancellable` instance into a `CancelBag`.
 	///
 	/// - Parameter cancelBag: `CancelBag` where `AnyCancellable` is going to be stored.

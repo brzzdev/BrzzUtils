@@ -9,7 +9,7 @@ extension DependencyValues {
 	}
 }
 
-extension UserDefaults: DependencyKey, @unchecked Sendable {
+extension UserDefaults: @retroactive DependencyKey, @retroactive @unchecked Sendable {
 	public static let liveValue = UserDefaults.standard
 	
 	public static let testValue = mock
@@ -17,7 +17,7 @@ extension UserDefaults: DependencyKey, @unchecked Sendable {
 	public static let mock = MockUserDefaults() as UserDefaults
 }
 
-public final class MockUserDefaults: UserDefaults {
+public final class MockUserDefaults: UserDefaults, @unchecked Sendable {
 	convenience init() {
 		self.init(suiteName: "Mock User Defaults")!
 	}

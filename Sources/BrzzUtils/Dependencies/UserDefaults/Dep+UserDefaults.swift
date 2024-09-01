@@ -28,7 +28,7 @@ extension UserDefaults {
 
 extension UserDefaults.Dependency: DependencyKey {
 	public static let liveValue: Self = {
-		let defaults = {
+		let defaults = { @Sendable in
 			@Dependency(\.userDefaultsProvider)
 			var userDefaultsProvider
 			return userDefaultsProvider

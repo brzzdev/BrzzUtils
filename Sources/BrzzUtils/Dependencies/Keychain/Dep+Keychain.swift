@@ -2,6 +2,7 @@ import Dependencies
 import DependenciesMacros
 import Foundation
 import KeychainSwift
+import Synchronization
 
 extension DependencyValues {
 	public var keychain: Keychain {
@@ -14,44 +15,34 @@ extension DependencyValues {
 public struct Keychain: Sendable {
 	private let id = UUID()
 	
-	public var clear: @Sendable () -> Void
-	public var getBool: @Sendable (_ key: String) -> Bool?
+	public var clear: @Sendable () -> Bool = {
+		unimplemented("\(Self.self).clear", placeholder: false)
+	}
+	public var delete: @Sendable (_ key: String) -> Bool = { _ in
+		unimplemented("\(Self.self).delete", placeholder: false)
+	}
 	public var getData: @Sendable (_ key: String) -> Data?
-	public var getString: @Sendable (_ key: String) -> String?
-	public var remove: @Sendable (_ key: String) -> Void
-	public var setBool: @Sendable (Bool?, _ key: String) -> Void
-	public var setData: @Sendable (Data?, _ key: String) -> Void
-	public var setString: @Sendable (String?, _ key: String) -> Void
+	public var setData: @Sendable (Data?, _ key: String) -> Bool = { _, _ in
+		unimplemented("\(Self.self).setData", placeholder: false)
+	}
 }
 
 extension Keychain: DependencyKey {
 	public static let liveValue: Self = {
-		let keychain = KeychainSwift()
+		let keychain = LockIsolated(KeychainSwift())
 		return Self(
-			clear: { keychain.clear() },
-			getBool: { keychain.getBool($0) },
-			getData: { keychain.getData($0) },
-			getString: { keychain.get($0) },
-			remove: { keychain.delete($0) },
-			setBool: { value, key in
-				if let value {
-					keychain.set(value, forKey: key)
-				} else {
-					keychain.delete(key)
-				}
+			clear: { keychain.withValue { $0.clear() } },
+			delete: { key in
+				keychain.withValue { $0.delete(key) }
+			},
+			getData: { key in
+				keychain.withValue { $0.getData(key) }
 			},
 			setData: { value, key in
 				if let value {
-					keychain.set(value, forKey: key)
+					keychain.withValue { $0.set(value, forKey: key) }
 				} else {
-					keychain.delete(key)
-				}
-			},
-			setString: { value, key in
-				if let value {
-					keychain.set(value, forKey: key)
-				} else {
-					keychain.delete(key)
+					keychain.withValue { $0.delete(key) }
 				}
 			}
 		)
@@ -60,14 +51,10 @@ extension Keychain: DependencyKey {
 	public static let testValue = Self()
 	
 	public static let noop = Self(
-		clear: {},
-		getBool: { _ in nil },
+		clear: { false },
+		delete: { _ in false },
 		getData: { _ in nil },
-		getString: { _ in nil },
-		remove: { _ in },
-		setBool: { _, _ in },
-		setData: { _, _ in },
-		setString: { _, _ in }
+		setData: { _, _ in false }
 	)
 }
 

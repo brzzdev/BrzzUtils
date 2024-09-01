@@ -2,41 +2,11 @@ import ComposableArchitecture
 import Foundation
 import KeychainSwift
 
-public struct BrzzSharedKeychainBool: PersistenceKey, Hashable {
-	public typealias Value = Bool?
-	
-	private let key: String
-	@Dependency(\.keychain)
-	private var keychain
-	
-	public init(_ key: String) {
-		self.key = key
-	}
-	
-	public func save(_ value: Value) {
-		keychain.setBool(value, key: key)
-	}
-	
-	public func load(initialValue: Value?) -> Value? {
-		guard let value = keychain.getBool(key: key) else {
-			keychain.setBool(initialValue ?? nil, key: key)
-			return initialValue
-		}
-		
-		return value
-	}
-	
-	public static func == (lhs: BrzzSharedKeychainBool, rhs: BrzzSharedKeychainBool) -> Bool {
-		lhs.key == rhs.key && lhs.keychain == rhs.keychain
-	}
-	
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(key)
-		hasher.combine(keychain)
-	}
-}
+public typealias SharedKeychain<T: Codable & Equatable> = PersistenceKeyDefault<KeychainKey<T>>
 
-public struct BrzzSharedKeychainCodable<Value: Codable>: PersistenceKey, Hashable {
+public struct KeychainKey<Value: Codable & Equatable>: PersistenceKey, Hashable {
+	private let cancelBag = CancelBag()
+	private let didSave = PassthroughSubjectOf<Value?>()
 	private let key: String
 	@Dependency(\.keychain)
 	private var keychain
@@ -47,129 +17,45 @@ public struct BrzzSharedKeychainCodable<Value: Codable>: PersistenceKey, Hashabl
 	
 	public func save(_ value: Value) {
 		guard let data = PropertyListEncoder.safeEncode(value) else { return }
-		keychain.setData(data, key: key)
+		if keychain.setData(data, key: key) {
+			didSave.send(value)
+		}
 	}
 	
 	public func load(initialValue: Value?) -> Value? {
 		guard let value = keychain.getData(key: key) else {
-			keychain.setData(PropertyListEncoder.safeEncode(initialValue) ?? nil, key: key)
+			if let initialValue,
+				 let value = PropertyListEncoder.safeEncode(initialValue) {
+				if keychain.setData(value, key: key) {
+					didSave.send(initialValue)
+				}
+			} else {
+				if keychain.setData(nil, key: key) {
+					didSave.send(nil)
+				}
+			}
 			return initialValue
 		}
 		
 		return PropertyListDecoder.safeDecode(value)
 	}
 	
-	public static func == (lhs: BrzzSharedKeychainCodable, rhs: BrzzSharedKeychainCodable) -> Bool {
-		lhs.key == rhs.key && lhs.keychain == rhs.keychain
-	}
-	
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(key)
-		hasher.combine(keychain)
-	}
-}
-
-public struct BrzzSharedKeychainData: PersistenceKey, Hashable {
-	public typealias Value = Data?
-	
-	private let key: String
-	@Dependency(\.keychain)
-	private var keychain
-	
-	public init(_ key: String) {
-		self.key = key
-	}
-	
-	public func save(_ value: Value) {
-		keychain.setData(value, key: key)
-	}
-	
-	public func load(initialValue: Value?) -> Value? {
-		guard let value = keychain.getData(key: key) else {
-			keychain.setData(initialValue ?? nil, key: key)
-			return initialValue
+	public func subscribe(
+		initialValue: Value?,
+		didSet: @escaping (Value?) -> Void
+	) -> Shared<Value>.Subscription {
+		didSave
+			.removeDuplicates()
+			.sink { newValue in
+				didSet(newValue)
+			}
+			.store(in: cancelBag)
+		return Shared.Subscription {
+			cancelBag.cancelAll()
 		}
-		
-		return value
 	}
 	
-	public static func == (lhs: BrzzSharedKeychainData, rhs: BrzzSharedKeychainData) -> Bool {
-		lhs.key == rhs.key && lhs.keychain == rhs.keychain
-	}
-	
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(key)
-		hasher.combine(keychain)
-	}
-}
-
-public struct BrzzSharedKeychainInt: PersistenceKey, Hashable {
-	public typealias Value = Int?
-	
-	private let key: String
-	@Dependency(\.keychain)
-	private var keychain
-	
-	public init(_ key: String) {
-		self.key = key
-	}
-	
-	public func save(_ value: Value) {
-		guard let data = encode(value) else { return }
-		keychain.setData(data, key: key)
-	}
-	
-	public func load(initialValue: Value?) -> Value? {
-		guard 
-			let data = keychain.getData(key: key),
-			let number = try? NSKeyedUnarchiver.unarchivedObject(ofClass: NSNumber.self, from: data) else {
-			keychain.setData(encode(initialValue ?? nil), key: key)
-			return initialValue
-		}
-		
-		return number.intValue
-	}
-	
-	private func encode(_ value: Value) -> Data? {
-		guard let value else { return nil }
-		return try? NSKeyedArchiver.archivedData(withRootObject: NSNumber(value: value), requiringSecureCoding: true)
-	}
-	
-	public static func == (lhs: BrzzSharedKeychainInt, rhs: BrzzSharedKeychainInt) -> Bool {
-		lhs.key == rhs.key && lhs.keychain == rhs.keychain
-	}
-	
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(key)
-		hasher.combine(keychain)
-	}
-}
-
-public struct BrzzSharedKeychainString: PersistenceKey, Hashable {
-	public typealias Value = String?
-	
-	private let key: String
-	@Dependency(\.keychain)
-	private var keychain
-	
-	public init(_ key: String) {
-		self.key = key
-	}
-	
-	public func save(_ value: Value) {
-		keychain.setString(value, key: key)
-	}
-	
-	public func load(initialValue: Value?) -> Value? {
-		guard let value = keychain.getString(key: key) else {
-			keychain.setString(initialValue ?? nil, key: key)
-			return initialValue
-		}
-		
-		return value
-	}
-	
-	public static func == (lhs: BrzzSharedKeychainString, rhs: BrzzSharedKeychainString) -> Bool {
+	public static func == (lhs: KeychainKey, rhs: KeychainKey) -> Bool {
 		lhs.key == rhs.key && lhs.keychain == rhs.keychain
 	}
 	
