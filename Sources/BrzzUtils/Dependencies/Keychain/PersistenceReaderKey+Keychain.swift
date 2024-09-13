@@ -1,12 +1,13 @@
+import Combine
 import ComposableArchitecture
 import Foundation
 import KeychainSwift
 
 public typealias SharedKeychain<T: Codable & Equatable> = PersistenceKeyDefault<KeychainKey<T>>
 
-public struct KeychainKey<Value: Codable & Equatable>: PersistenceKey, Hashable {
+public struct KeychainKey<Value: Codable & Equatable & Sendable>: PersistenceKey, Hashable {
 	private let cancelBag = CancelBag()
-	private let didSave = PassthroughSubjectOf<Value?>()
+	private let didSave = PassthroughSubject<Value?, Never>()
 	private let key: String
 	@Dependency(\.keychain)
 	private var keychain

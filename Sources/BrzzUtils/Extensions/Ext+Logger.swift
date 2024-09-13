@@ -1,5 +1,5 @@
 import Foundation
-@_exported import OSLog
+import OSLog
 
 extension Logger: @unchecked Sendable {}
 
