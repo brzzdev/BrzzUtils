@@ -17,10 +17,6 @@ let package = Package(
 	],
 	dependencies: [
 		.package(
-			url: "https://github.com/evgenyneu/keychain-swift",
-			from: "24.0.0"
-		),
-		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture",
 			from: "1.0.0"
 		),
@@ -32,10 +28,6 @@ let package = Package(
 				.product(
 					name: "ComposableArchitecture",
 					package: "swift-composable-architecture"
-				),
-				.product(
-					name: "KeychainSwift",
-					package: "keychain-swift"
 				),
 			]
 		),

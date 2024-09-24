@@ -18,20 +18,20 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: PersistenceKey
 	
 	public func save(_ value: Value) {
 		guard let data = JSONEncoder.safeEncode(value) else { return }
-		if keychain.setData(data, key: key) {
+		if keychain.set(data, key: key) {
 			didSave.send(value)
 		}
 	}
 	
 	public func load(initialValue: Value?) -> Value? {
-		guard let value = keychain.getData(key: key) else {
+		guard let value = keychain.get(key: key) else {
 			if let initialValue,
 				 let value = JSONEncoder.safeEncode(initialValue) {
-				if keychain.setData(value, key: key) {
+				if keychain.set(value, key: key) {
 					didSave.send(initialValue)
 				}
 			} else {
-				if keychain.setData(nil, key: key) {
+				if keychain.set(nil, key: key) {
 					didSave.send(nil)
 				}
 			}
