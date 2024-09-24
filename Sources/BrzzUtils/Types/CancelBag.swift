@@ -21,6 +21,13 @@ public final class CancelBag: Sendable {
 		}
 	}
 	
+	/// Returns if our stored `AnyCancellable`s are empty
+	public var isEmpty: Bool {
+		cancellables.withValue {
+			$0.isEmpty
+		}
+	}
+	
 	/// `CancellablesBuilder` makes use of `resultBuilder` attribute to transform individual
 	/// input `AnyCancellable` instances into a single `Array` of `AnyCancellable` instances.
 	@resultBuilder

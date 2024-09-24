@@ -1,22 +1,25 @@
 @testable import BrzzUtils
-import XCTest
+import Testing
 
-final class ExtCollectionTests: XCTestCase {
-	func testIsNotEmpty() {
+@Suite
+struct ExtCollectionTests {
+	@Test
+	func isNotEmpty() async throws {
 		// GIVEN
 		let nonEmptyArray = [1, 2, 3]
-		let emptyArray: [Int] = []
+		let emptyArray = [Int]()
 		
 		// WHEN
 		let nonEmptyIsNotEmpty = nonEmptyArray.isNotEmpty
 		let emptyIsNotEmpty = emptyArray.isNotEmpty
 		
 		// THEN
-		XCTAssertTrue(nonEmptyIsNotEmpty)
-		XCTAssertFalse(emptyIsNotEmpty)
+		#expect(nonEmptyIsNotEmpty)
+		#expect(!emptyIsNotEmpty)
 	}
 	
-	func testSafeSubscription() {
+	@Test
+	func safeSubscription() {
 		// GIVEN
 		let array = [1, 2, 3]
 		
@@ -25,11 +28,12 @@ final class ExtCollectionTests: XCTestCase {
 		let outOfBoundsResult = array[safe: 10]
 		
 		// THEN
-		XCTAssertEqual(withinBoundsResult, 2)
-		XCTAssertNil(outOfBoundsResult)
+		#expect(withinBoundsResult == 2)
+		#expect(outOfBoundsResult == nil)
 	}
-	
-	func testMutableCollectionSafeSubscription() {
+
+	@Test
+	func mutableCollectionSafeSubscription() {
 		// GIVEN
 		var array = [1, 2, 3]
 		
@@ -38,8 +42,8 @@ final class ExtCollectionTests: XCTestCase {
 		let receivedOutOfBoundsVal = array[safe: 10]
 		
 		// THEN
-		XCTAssertEqual(receivedWithinBoundsVal, 2)
-		XCTAssertNil(receivedOutOfBoundsVal)
+		#expect(receivedWithinBoundsVal == 2)
+		#expect(receivedOutOfBoundsVal == nil)
 		
 		// GIVEN
 		let newWithinBoundsVal = 5
@@ -51,7 +55,7 @@ final class ExtCollectionTests: XCTestCase {
 		array[safe: outOfBoundsIndex] = newOutOfBoundsVal
 		
 		// THEN
-		XCTAssertEqual(array[safe: 1], newWithinBoundsVal)
-		XCTAssertEqual(array.count, 3)  // Out-of-bounds adding doesn't expand the array
+		#expect(array[safe: 1] == newWithinBoundsVal)
+		#expect(array.count == 3)  // Out-of-bounds adding doesn't expand the array
 	}
 }
