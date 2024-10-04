@@ -1,7 +1,6 @@
 import Combine
 import ComposableArchitecture
 import Foundation
-import KeychainSwift
 
 public typealias SharedKeychain<T: Codable & Equatable> = PersistenceKeyDefault<KeychainKey<T>>
 
