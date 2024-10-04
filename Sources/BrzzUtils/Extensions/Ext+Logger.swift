@@ -1,8 +1,6 @@
 import Foundation
 import OSLog
 
-extension Logger: @unchecked Sendable {}
-
 extension Logger {
 	private static var subsystem: String {
 		guard let bundleIdentifier = Bundle.main.bundleIdentifier else {
