@@ -5,10 +5,10 @@ import PackageDescription
 let package = Package(
 	name: "BrzzUtils",
 	platforms: [
-		.iOS(.v14),
-		.macOS(.v11),
-		.tvOS(.v14),
-		.watchOS(.v7),
+		.iOS(.v18),
+		.macOS(.v15),
+		.tvOS(.v18),
+		.watchOS(.v11),
 	],
 	products: [
 		.library(
