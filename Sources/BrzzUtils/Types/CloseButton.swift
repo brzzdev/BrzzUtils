@@ -21,7 +21,6 @@ public struct CloseButton: View {
 				case .circle:
 					Image(systemName: "xmark.circle.fill")
 						.font(.system(size: 20))
-						.tint(.primary)
 					
 				case .text:
 					Text("Close")
@@ -32,7 +31,9 @@ public struct CloseButton: View {
 		.accessibilityLabel(Text("Close"))
 	}
 	
-	public init(style: Style = .circle) {
+	public init(
+		style: Style = .circle
+	) {
 		self.style = style
 	}
 }
