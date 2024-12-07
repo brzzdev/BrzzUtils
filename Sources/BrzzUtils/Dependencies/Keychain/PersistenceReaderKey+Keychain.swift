@@ -2,20 +2,24 @@ import Combine
 import ComposableArchitecture
 import Foundation
 
-public typealias SharedKeychain<T: Codable & Equatable> = PersistenceKeyDefault<KeychainKey<T>>
+public typealias SharedKeychain<T: Codable & Equatable> = _SharedKeyDefault<KeychainKey<T>>
 
-public struct KeychainKey<Value: Codable & Equatable & Sendable>: PersistenceKey, Hashable {
+public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 	private let cancelBag = CancelBag()
 	private let didSave = PassthroughSubject<Value?, Never>()
 	private let key: String
 	@Dependency(\.keychain)
 	private var keychain
 	
+	public var id: KeychainKeyID {
+		KeychainKeyID(key: key, keychain: keychain)
+	}
+	
 	public init(_ key: String) {
 		self.key = key
 	}
 	
-	public func save(_ value: Value) {
+	public func save(_ value: Value, immediately: Bool) {
 		guard let data = JSONEncoder.safeEncode(value) else { return }
 		if keychain.set(data, key: key) {
 			didSave.send(value)
@@ -43,24 +47,20 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: PersistenceKey
 	public func subscribe(
 		initialValue: Value?,
 		didSet: @escaping (Value?) -> Void
-	) -> Shared<Value>.Subscription {
+	) -> SharedSubscription {
 		didSave
 			.removeDuplicates()
 			.sink { newValue in
 				didSet(newValue)
 			}
 			.store(in: cancelBag)
-		return Shared.Subscription {
+		return SharedSubscription {
 			cancelBag.cancelAll()
 		}
 	}
-	
-	public static func == (lhs: KeychainKey, rhs: KeychainKey) -> Bool {
-		lhs.key == rhs.key && lhs.keychain == rhs.keychain
-	}
-	
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(key)
-		hasher.combine(keychain)
-	}
+}
+
+public struct KeychainKeyID: Hashable {
+	fileprivate let key: String
+	fileprivate let keychain: Keychain
 }
