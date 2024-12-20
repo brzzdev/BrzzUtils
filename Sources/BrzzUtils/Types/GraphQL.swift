@@ -4,23 +4,29 @@ import Foundation
 ///
 /// Example usage:
 /// ```swift
-/// let query = GraphQL.Query(
-///     operation: "query ($id: Int)",
-///     fields: [
-///         .object("Media(id: $id, type: ANIME)", [
-///             .scalar("id"),
-///             .object("title", [
-///                 .scalar("english"),
-///                 .scalar("native")
-///             ]),
-///             .scalar("episodes")
-///         ])
-///     ]
-/// )
+///	let query = GraphQL.Query(
+///		operation: "query ($id: Int)",
+///		fields: [
+///			.object(
+///				"Media(id: $id, type: ANIME)",
+///				[
+///					.scalar("id"),
+///					.object(
+///						"title",
+///						[
+///							.scalar("english"),
+///							.scalar("native")
+///						]
+///					),
+///					.scalar("episodes")
+///				]
+///			)
+///		]
+///	)
 /// ```
-public enum GraphQL {
+public enum GraphQL: Sendable {
 	/// Represents a field in a GraphQL query.
-	public enum Field {
+	public enum Field: Sendable {
 		/// A scalar field that represents a leaf node in the query (e.g., "id", "name").
 		case scalar(String)
 		/// A complex field that can contain nested fields.
@@ -49,7 +55,7 @@ public enum GraphQL {
 	}
 	
 	/// Represents a complete GraphQL query with an operation and fields.
-	public struct Query {
+	public struct Query: Sendable {
 		/// The operation definition (e.g., "query ($id: Int)").
 		private let operation: String
 		/// The fields to be queried.
