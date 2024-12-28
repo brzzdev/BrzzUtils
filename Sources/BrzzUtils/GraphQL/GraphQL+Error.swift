@@ -1,7 +1,7 @@
 import Foundation
 
 extension GraphQL {
-	public struct Error: LocalizedError, Decodable {
+	public struct Error: Decodable, LocalizedError {
 		public let locations: [ErrorLocation]?
 		public let message: String
 		public let status: Int?
