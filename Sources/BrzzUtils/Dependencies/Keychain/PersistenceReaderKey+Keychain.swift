@@ -19,16 +19,29 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 		self.key = key
 	}
 	
-	public func save(_ value: Value, immediately: Bool) {
-		guard let data = JSONEncoder.safeEncode(value) else { return }
+	public func save(
+		_ value: Value,
+		context: SaveContext,
+		continuation: SaveContinuation
+	) {
+		guard let data = JSONEncoder.safeEncode(value) else {
+			assertionFailure("Failed to encode - \(value)")
+			continuation.resume()
+			return
+		}
 		if keychain.set(data, key: key) {
 			didSave.send(value)
 		}
+		continuation.resume()
 	}
 	
-	public func load(initialValue: Value?) -> Value? {
-		guard let value = keychain.get(key: key) else {
-			if let initialValue,
+	public func load(
+		context: LoadContext<Value>,
+		continuation: LoadContinuation<Value>
+	) {
+		guard let value = keychain.get(key: key),
+					let value: Value = JSONDecoder.safeDecode(value) else {
+			if let initialValue = context.initialValue,
 				 let value = JSONEncoder.safeEncode(initialValue) {
 				if keychain.set(value, key: key) {
 					didSave.send(initialValue)
@@ -38,20 +51,21 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 					didSave.send(nil)
 				}
 			}
-			return initialValue
+			continuation.resumeReturningInitialValue()
+			return
 		}
 		
-		return JSONDecoder.safeDecode(value)
+		continuation.resume(returning: value)
 	}
 	
 	public func subscribe(
-		initialValue: Value?,
-		didSet: @escaping (Value?) -> Void
+		context: LoadContext<Value>,
+		subscriber: SharedSubscriber<Value>
 	) -> SharedSubscription {
 		didSave
 			.removeDuplicates()
 			.sink { newValue in
-				didSet(newValue)
+				subscriber.yield(with: Result { (newValue) })
 			}
 			.store(in: cancelBag)
 		return SharedSubscription {
