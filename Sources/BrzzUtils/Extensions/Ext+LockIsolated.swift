@@ -15,7 +15,7 @@ extension LockIsolated where Value: Numeric {
 	public func decrease() {
 		withValue { $0 -= 1 }
 	}
-	
+
 	public func increase() {
 		withValue { $0 += 1 }
 	}

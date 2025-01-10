@@ -1,0 +1,6 @@
+if ! SWIFTFORMAT=$(/opt/homebrew/bin/mint which swiftformat); then
+    echo "Run 'make tools' to update dependencies"
+    exit 1
+fi
+SWIFTFORMAT_PATH=$(echo "$SWIFTFORMAT" | tail -n1)
+./.git-format-staged --formatter "$SWIFTFORMAT_PATH stdin --stdinpath '{}'" "*.swift"

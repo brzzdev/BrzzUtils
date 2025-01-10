@@ -34,22 +34,22 @@ extension Collection where Index == Int {
 	public subscript(safe index: Index) -> Element? {
 		validIndex(index, count: count) ? self[index] : nil
 	}
-	
+
 	/// Returns a new array with the element inserted at the end
 	public func appending(_ element: Element) -> [Element] {
 		self + [element]
 	}
-	
+
 	/// Returns a new array with the element inserted at the beginning
 	public func prepending(_ element: Element) -> [Element] {
 		[element] + self
 	}
-	
+
 	/// Returns a new array with elements inserted at the end
 	public func appending(contentsOf elements: [Element]) -> [Element] {
 		self + elements
 	}
-	
+
 	/// Returns a new array with elements inserted at the beginning
 	public func prepending(contentsOf elements: [Element]) -> [Element] {
 		elements + self
@@ -75,7 +75,7 @@ extension MutableCollection where Index == Int {
 		get {
 			validIndex(index, count: count) ? self[index] : nil
 		}
-		
+
 		set {
 			if let newValue, validIndex(index, count: count) {
 				self[index] = newValue

@@ -7,10 +7,10 @@ extension Logger {
 			assertionFailure("bundleIdentifier should not be nil")
 			return "No subsystem"
 		}
-		
+
 		return bundleIdentifier
 	}
-	
+
 	/// This initializer creates a new instance of `Logger` using the `bundleIdentifier` of the main app bundle as the
 	/// `subsystem`. If, for any reason, the `bundleIdentifier` is not available, it defaults to a string "No subsystem".
 	public init(category: String) {
@@ -19,11 +19,7 @@ extension Logger {
 			category: category
 		)
 	}
-	
-	public func error(_ error: Error) {
-		self.error("\(error)")
-	}
-	
+
 	/// Creates a `Logger` instance for a specific module.
 	/// Module identification is derived from a file's path, typically the `#fileID` compiler literal.
 	public static func forModule(fileID: String = #fileID) -> Logger {
@@ -32,7 +28,11 @@ extension Logger {
 			assertionFailure("moduleName should not be nil")
 			return Logger(category: "No category")
 		}
-		
+
 		return Logger(category: String(moduleName))
+	}
+
+	public func error(_ error: Error) {
+		self.error("\(error)")
 	}
 }

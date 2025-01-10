@@ -7,7 +7,7 @@ extension JSONDecoder {
 }
 
 extension JSONEncoder {
-	public static func safeEncode<T: Encodable>(_ value: T?) -> Data? {
+	public static func safeEncode(_ value: (some Encodable)?) -> Data? {
 		guard let value else { return nil }
 		return try? JSONEncoder().encode(value)
 	}

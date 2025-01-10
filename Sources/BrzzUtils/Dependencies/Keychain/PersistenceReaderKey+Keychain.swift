@@ -10,15 +10,15 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 	private let key: String
 	@Dependency(\.keychain)
 	private var keychain
-	
+
 	public var id: KeychainKeyID {
 		KeychainKeyID(key: key, keychain: keychain)
 	}
-	
+
 	public init(_ key: String) {
 		self.key = key
 	}
-	
+
 	public func save(
 		_ value: Value,
 		context: SaveContext,
@@ -34,15 +34,17 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 		}
 		continuation.resume()
 	}
-	
+
 	public func load(
 		context: LoadContext<Value>,
 		continuation: LoadContinuation<Value>
 	) {
-		guard let value = keychain.get(key: key),
-					let value: Value = JSONDecoder.safeDecode(value) else {
-			if let initialValue = context.initialValue,
-				 let value = JSONEncoder.safeEncode(initialValue) {
+		guard
+			let value = keychain.get(key: key),
+			let value: Value = JSONDecoder.safeDecode(value) else {
+			if
+				let initialValue = context.initialValue,
+				let value = JSONEncoder.safeEncode(initialValue) {
 				if keychain.set(value, key: key) {
 					didSave.send(initialValue)
 				}
@@ -54,10 +56,10 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 			continuation.resumeReturningInitialValue()
 			return
 		}
-		
+
 		continuation.resume(returning: value)
 	}
-	
+
 	public func subscribe(
 		context: LoadContext<Value>,
 		subscriber: SharedSubscriber<Value>
@@ -65,7 +67,7 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 		didSave
 			.removeDuplicates()
 			.sink { newValue in
-				subscriber.yield(with: Result { (newValue) })
+				subscriber.yield(with: Result { newValue })
 			}
 			.store(in: cancelBag)
 		return SharedSubscription {

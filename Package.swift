@@ -13,7 +13,8 @@ let package = Package(
 	products: [
 		.library(
 			name: "BrzzUtils",
-			targets: ["BrzzUtils"]),
+			targets: ["BrzzUtils"]
+		),
 	],
 	dependencies: [
 		.package(
