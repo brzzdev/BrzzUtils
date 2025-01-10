@@ -11,23 +11,6 @@ import Foundation
 /// This class can be used to keep track of multiple `AnyCancellable` instances,
 /// store new `AnyCancellable` instances, and cancel all stored `AnyCancellable` instances.
 public final class CancelBag: Sendable {
-	/// A thread-safe setter for `Set<AnyCancellable>`.
-	fileprivate let cancellables = LockIsolated(Set<AnyCancellable>())
-	
-	/// Returns count of `AnyCancellable` instances in `CancelBag`.
-	public var count: Int {
-		cancellables.withValue {
-			$0.count
-		}
-	}
-	
-	/// Returns if our stored `AnyCancellable`s are empty
-	public var isEmpty: Bool {
-		cancellables.withValue {
-			$0.isEmpty
-		}
-	}
-	
 	/// `CancellablesBuilder` makes use of `resultBuilder` attribute to transform individual
 	/// input `AnyCancellable` instances into a single `Array` of `AnyCancellable` instances.
 	@resultBuilder
@@ -36,13 +19,28 @@ public final class CancelBag: Sendable {
 			cancellables
 		}
 	}
-	
-	// MARK: Lifecycle
-	
+
+	/// A thread-safe setter for `Set<AnyCancellable>`.
+	fileprivate let cancellables = LockIsolated(Set<AnyCancellable>())
+
+	/// Returns count of `AnyCancellable` instances in `CancelBag`.
+	public var count: Int {
+		cancellables.withValue {
+			$0.count
+		}
+	}
+
+	/// Returns if our stored `AnyCancellable`s are empty
+	public var isEmpty: Bool {
+		cancellables.withValue {
+			$0.isEmpty
+		}
+	}
+
 	public init() {}
-	
+
 	// MARK: Public
-	
+
 	/// Cancels all `AnyCancellable` instances in `CancelBag`.
 	public func cancelAll() {
 		cancellables.withValue { cancellables in
@@ -50,14 +48,14 @@ public final class CancelBag: Sendable {
 			cancellables = []
 		}
 	}
-	
+
 	/// Stores a new `AnyCancellable` instance.
 	///
 	/// - Parameter cancellable: A block that returns an `AnyCancellable` instance.
 	public func store(@CancellablesBuilder _ cancellable: @Sendable () -> AnyCancellable) {
 		store { cancellable() }
 	}
-	
+
 	/// Stores multiple new `AnyCancellable` instances.
 	///
 	/// - Parameter newCancellables: A block that returns an `Array` of `AnyCancellable` instances.

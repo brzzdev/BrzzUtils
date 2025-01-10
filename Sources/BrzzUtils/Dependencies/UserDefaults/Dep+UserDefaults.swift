@@ -47,9 +47,9 @@ extension UserDefaults.Dependency: DependencyKey {
 			setString: { defaults().set($0, forKey: $1) }
 		)
 	}()
-	
+
 	public static let testValue = Self()
-	
+
 	public static let noop = Self { _ in
 		false
 	} dataForKey: { _ in
@@ -61,16 +61,15 @@ extension UserDefaults.Dependency: DependencyKey {
 	} stringForKey: { _ in
 		nil
 	} remove: { _ in
-		
+
 	} setBool: { _, _ in
-		
+
 	} setData: { _, _ in
-		
+
 	} setDouble: { _, _ in
-		
+
 	} setInteger: { _, _ in
-		
+
 	} setString: { _, _ in
-		
 	}
 }

@@ -12,13 +12,15 @@ extension DependencyValues {
 @DependencyClient
 public struct Keychain: Sendable {
 	private let id = UUID()
-	
+
 	public var clear: @Sendable () -> Bool = {
 		unimplemented("\(Self.self).clear", placeholder: false)
 	}
+
 	public var delete: @Sendable (_ key: String) -> Bool = { _ in
 		unimplemented("\(Self.self).delete", placeholder: false)
 	}
+
 	public var get: @Sendable (_ key: String) -> Data?
 	public var set: @Sendable (Data?, _ key: String) -> Bool = { _, _ in
 		unimplemented("\(Self.self).set", placeholder: false)
@@ -45,9 +47,9 @@ extension Keychain: DependencyKey {
 			}
 		)
 	}()
-	
+
 	public static let testValue = Self()
-	
+
 	public static let noop = Self(
 		clear: { false },
 		delete: { _ in false },
@@ -60,7 +62,7 @@ extension Keychain: Hashable {
 	public static func == (lhs: Keychain, rhs: Keychain) -> Bool {
 		lhs.id == rhs.id
 	}
-	
+
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(id)
 	}
@@ -77,25 +79,25 @@ private struct _Keychain: Sendable {
 		static let secUseDataProtectionKeychain = kSecUseDataProtectionKeychain as String
 		static let valueData = kSecValueData as String
 	}
-	
+
 	private let lock = NSLock()
-	
+
 	func clear() -> Bool {
 		lock.withLock {
 			SecItemDelete(
 				[
-					Const.klass: kSecClassGenericPassword
+					Const.klass: kSecClassGenericPassword,
 				] as CFDictionary
 			) == noErr
 		}
 	}
-	
+
 	func delete(_ key: String) -> Bool {
 		lock.withLock {
 			SecItemDelete(getQuery(key: key)) == noErr
 		}
 	}
-	
+
 	func get(_ key: String) -> Data? {
 		lock.withLock {
 			let query = getQuery(
@@ -105,22 +107,22 @@ private struct _Keychain: Sendable {
 					Const.returnData: kCFBooleanTrue!,
 				]
 			)
-			
+
 			var result: AnyObject?
-			
+
 			let resultCode = withUnsafeMutablePointer(to: &result) {
 				SecItemCopyMatching(query as CFDictionary, UnsafeMutablePointer($0))
 			}
-			
+
 			guard resultCode == noErr else { return nil }
-			
+
 			return result as? Data
 		}
 	}
-	
+
 	func set(_ value: Data, forKey key: String) -> Bool {
 		_ = delete(key)
-		
+
 		return lock.withLock {
 			let resultCode = SecItemAdd(
 				getQuery(
@@ -135,7 +137,7 @@ private struct _Keychain: Sendable {
 			return resultCode == noErr
 		}
 	}
-	
+
 	private func getQuery(
 		key: String,
 		adding additionalQueries: [String: Any] = [:]

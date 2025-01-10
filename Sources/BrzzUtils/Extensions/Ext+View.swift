@@ -12,7 +12,7 @@ private struct FirstAppearModifier: ViewModifier {
 	let action: () async -> Void
 	@State
 	private var isFirstAppearance = true
-	
+
 	func body(content: Content) -> some View {
 		content
 			.task {
