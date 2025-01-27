@@ -2,8 +2,6 @@ import Combine
 import ComposableArchitecture
 import Foundation
 
-public typealias SharedKeychain<T: Codable & Equatable> = _SharedKeyDefault<KeychainKey<T>>
-
 public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 	private let cancelBag = CancelBag()
 	private let didSave = PassthroughSubject<Value?, Never>()
