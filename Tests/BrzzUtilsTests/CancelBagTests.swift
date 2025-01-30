@@ -40,24 +40,17 @@ struct CancelBagTests {
 		var isCancelled1 = false
 		var isCancelled2 = false
 
-		let cancellable1 = AnyCancellable { isCancelled1 = true }
-		let cancellable2 = AnyCancellable { isCancelled2 = true }
-
-		cancelBag.store {
-			cancellable1
-			cancellable2
-		}
+		AnyCancellable { isCancelled1 = true }.store(in: cancelBag)
+		AnyCancellable { isCancelled2 = true }.store(in: cancelBag)
 
 		#expect(cancelBag.count == 2)
-
 		#expect(!isCancelled1)
 		#expect(!isCancelled2)
 
 		cancelBag.cancelAll()
 
+		#expect(cancelBag.isEmpty)
 		#expect(isCancelled1)
 		#expect(isCancelled2)
-
-		#expect(cancelBag.isEmpty)
 	}
 }
