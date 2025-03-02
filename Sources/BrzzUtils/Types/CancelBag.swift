@@ -1,8 +1,6 @@
 import Combine
 import Foundation
 
-// MARK: - CancelBag
-
 /// `CancelBag` is a utility class that stores multiple `AnyCancellable` instances and provides functionalities
 /// to handle their lifecycle collectively.
 /// The `AnyCancellable` instances are stored in a thread-safe manner.
@@ -29,8 +27,6 @@ public final class CancelBag: @unchecked Sendable {
 
 	public init() {}
 
-	// MARK: Public
-
 	/// Cancels all `AnyCancellable` instances in `CancelBag`.
 	public func cancelAll() {
 		lock.withLock {
@@ -45,8 +41,6 @@ public final class CancelBag: @unchecked Sendable {
 		}
 	}
 }
-
-// MARK: - AnyCancellable + Sendable
 
 /// Extension to `AnyCancellable` class to easily store an `AnyCancellable` instance to a `CancelBag`.
 extension AnyCancellable {
