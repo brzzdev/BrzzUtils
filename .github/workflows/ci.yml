@@ -54,7 +54,7 @@ jobs:
       - name: Build and Test
         run: |
           set -o pipefail && xcodebuild test \
-          -scheme BrzzUtils \
+          -scheme BrzzUtils-Package \
           -destination '${{ matrix.destination }}' \
           -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
           -resultBundlePath TestResults-${{ matrix.platform }} \
