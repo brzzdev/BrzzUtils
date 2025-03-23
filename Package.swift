@@ -12,6 +12,10 @@ let package = Package(
 	],
 	products: [
 		.library(
+			name: "BrzzTestUtils",
+			targets: ["BrzzTestUtils"]
+		),
+		.library(
 			name: "BrzzUtils",
 			targets: ["BrzzUtils"]
 		),
@@ -23,6 +27,16 @@ let package = Package(
 		),
 	],
 	targets: [
+		.target(
+			name: "BrzzTestUtils",
+			dependencies: [
+				"BrzzUtils",
+			]
+		),
+		.testTarget(
+			name: "BrzzTestUtilsTests",
+			dependencies: ["BrzzTestUtils"]
+		),
 		.target(
 			name: "BrzzUtils",
 			dependencies: [

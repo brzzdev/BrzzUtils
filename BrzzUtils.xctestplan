@@ -13,7 +13,13 @@
   },
   "testTargets" : [
     {
-      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:",
+        "identifier" : "BrzzTestUtilsTests",
+        "name" : "BrzzTestUtilsTests"
+      }
+    },
+    {
       "target" : {
         "containerPath" : "container:",
         "identifier" : "BrzzUtilsTests",
