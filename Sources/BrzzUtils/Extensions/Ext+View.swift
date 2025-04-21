@@ -1,6 +1,11 @@
 import SwiftUI
 
 extension View {
+	public func alignFrame(_ alignment: TextAlignment) -> some View {
+		frame(maxWidth: .infinity, alignment: alignment.toAlignment())
+			.multilineTextAlignment(alignment)
+	}
+
 	public func onFirstAppear(perform action: @escaping () async -> Void) -> some View {
 		modifier(FirstAppearModifier(action: action))
 	}
