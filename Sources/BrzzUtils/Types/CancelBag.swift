@@ -1,4 +1,5 @@
 import Combine
+import ConcurrencyExtras
 import Foundation
 
 /// `CancelBag` is a utility class that stores multiple `AnyCancellable` instances and provides functionalities
@@ -7,38 +8,49 @@ import Foundation
 ///
 /// This class can be used to keep track of multiple `AnyCancellable` instances,
 /// store new `AnyCancellable` instances, and cancel all stored `AnyCancellable` instances.
-public final class CancelBag: @unchecked Sendable {
-	private var cancellables = Set<AnyCancellable>()
-	private let lock = NSLock()
+public struct CancelBag: Sendable {
+	private let cancellables = LockIsolated<Set<AnyCancellable>>([])
+	private let onlyOne: Bool
 
 	/// Count of `AnyCancellable` held in `CancelBag`.
 	public var count: Int {
-		lock.withLock {
-			cancellables.count
+		cancellables.withValue {
+			$0.count
 		}
 	}
 
 	/// If `CancelBag` is empty.
 	public var isEmpty: Bool {
-		lock.withLock {
-			cancellables.isEmpty
+		cancellables.withValue {
+			$0.isEmpty
 		}
 	}
 
-	public init() {}
+	public init(onlyOne: Bool = false) {
+		self.onlyOne = onlyOne
+	}
 
 	/// Cancels all `AnyCancellable` instances in `CancelBag`.
 	public func cancelAll() {
-		lock.withLock {
-			cancellables.forEach { $0.cancel() }
-			cancellables = []
+		cancellables.withValue {
+			cancelAll(&$0)
 		}
 	}
 
 	fileprivate func store(_ cancellable: AnyCancellable) {
-		lock.withLock {
-			_ = cancellables.insert(cancellable)
+		nonisolated(unsafe) let cancellable = cancellable
+		cancellables.withValue {
+			if onlyOne {
+				cancelAll(&$0)
+			}
+
+			$0.insert(cancellable)
 		}
+	}
+
+	private func cancelAll(_ set: inout Set<AnyCancellable>) {
+		set.forEach { $0.cancel() }
+		set = []
 	}
 }
 
