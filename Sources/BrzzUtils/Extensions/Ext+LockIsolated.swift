@@ -11,7 +11,7 @@ extension LockIsolated {
 	}
 }
 
-extension LockIsolated where Value: Numeric {
+extension LockIsolated where Value: Numeric & Sendable {
 	public func decrease() {
 		withValue { $0 -= 1 }
 	}
