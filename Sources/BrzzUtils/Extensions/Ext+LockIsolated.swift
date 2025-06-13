@@ -20,3 +20,5 @@ extension LockIsolated where Value: Numeric & Sendable {
 		withValue { $0 += 1 }
 	}
 }
+
+fafsafsaf
