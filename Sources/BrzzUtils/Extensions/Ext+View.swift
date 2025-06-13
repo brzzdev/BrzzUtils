@@ -9,6 +9,22 @@ extension View {
 	public func onFirstAppear(perform action: @escaping () async -> Void) -> some View {
 		modifier(FirstAppearModifier(action: action))
 	}
+
+	public func readFrame(
+		in coordinateSpace: CoordinateSpace = .global,
+		onChange: @escaping (CGRect) -> Void
+	) -> some View {
+		background(
+			GeometryReader { gp in
+				Color.clear
+					.preference(
+						key: FramePreferenceKey.self,
+						value: gp.frame(in: coordinateSpace)
+					)
+			}
+		)
+		.onPreferenceChange(FramePreferenceKey.self, perform: onChange)
+	}
 }
 
 private struct FirstAppearModifier: ViewModifier {
@@ -25,4 +41,10 @@ private struct FirstAppearModifier: ViewModifier {
 				}
 			}
 	}
+}
+
+private struct FramePreferenceKey: PreferenceKey {
+	static let defaultValue = CGRect.zero
+
+	static func reduce(value: inout CGRect, nextValue: () -> CGRect) {}
 }
