@@ -22,6 +22,11 @@ extension Date {
 		return Date(timeIntervalSinceReferenceDate: randomTimeInterval)
 	}
 
+	public static func random() -> Date {
+		let randomTime = TimeInterval(Int.random(in: 0 ... Int.max))
+		return Date(timeIntervalSince1970: randomTime)
+	}
+
 	/// Converts `self` to its textual representation that contains both the date and time parts. The exact format depends on the user's preferences.
 	/// - Parameters:
 	///   - style: The custom style used.
