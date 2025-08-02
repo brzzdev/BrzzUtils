@@ -37,7 +37,7 @@ let package = Package(
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-tagged",
-			from: "0.0.0"
+			from: "0.10.0"
 		),
 	],
 	targets: [
