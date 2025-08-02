@@ -17,11 +17,6 @@ public enum TestError: Error, CustomStringConvertible, Equatable {
 		message: "An unknown error occurred"
 	)
 
-	/// Returns a random error for testing purposes
-	public static var randomError: TestError {
-		.custom(code: Int.randomFullRange, message: UUID().uuidString)
-	}
-
 	public var description: String {
 		switch self {
 		case .networkError:
@@ -46,6 +41,13 @@ public enum TestError: Error, CustomStringConvertible, Equatable {
 
 	public var localizedDescription: String {
 		description
+	}
+}
+
+extension TestError {
+	/// Returns a random error for testing purposes
+	public static func random() -> TestError {
+		.custom(code: Int.randomFullRange(), message: UUID().uuidString)
 	}
 }
 #endif

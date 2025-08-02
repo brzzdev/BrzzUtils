@@ -62,7 +62,7 @@ struct TestErrorTests {
 
 	@Test
 	func randomError() {
-		let error = TestError.randomError
+		let error = TestError.random()
 		switch error {
 		case let .custom(code, message):
 			// Verify that the custom error has a code within a plausible range and a non-empty message.
