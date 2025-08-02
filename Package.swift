@@ -2,6 +2,16 @@
 
 import PackageDescription
 
+private let Tagged = Target.Dependency.product(
+	name: "Tagged",
+	package: "swift-tagged"
+)
+
+private let TCA = Target.Dependency.product(
+	name: "ComposableArchitecture",
+	package: "swift-composable-architecture"
+)
+
 let package = Package(
 	name: "BrzzUtils",
 	platforms: [
@@ -23,7 +33,11 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture",
-			from: "1.20.2"
+			from: "1.0.0"
+		),
+		.package(
+			url: "https://github.com/pointfreeco/swift-tagged",
+			from: "0.0.0"
 		),
 	],
 	targets: [
@@ -40,10 +54,8 @@ let package = Package(
 		.target(
 			name: "BrzzUtils",
 			dependencies: [
-				.product(
-					name: "ComposableArchitecture",
-					package: "swift-composable-architecture"
-				),
+				Tagged,
+				TCA,
 			]
 		),
 		.testTarget(

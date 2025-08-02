@@ -14,12 +14,17 @@ extension Date {
 		case iso
 	}
 
-	/// Returns a random Date between Date.distantPast and Date.distantFuture
-	public static var randomFullRange: Date {
-		let minTime = Date.distantPast.timeIntervalSinceReferenceDate
-		let maxTime = Date.distantFuture.timeIntervalSinceReferenceDate
-		let randomTimeInterval = TimeInterval.random(in: minTime ... maxTime)
-		return Date(timeIntervalSinceReferenceDate: randomTimeInterval)
+	/// Generates a random date.
+	///
+	/// Creates a random `Date` instance by generating a random time interval
+	/// since the Unix epoch (January 1, 1970, 00:00:00 UTC).
+	///
+	/// - Returns: A randomly generated `Date` instance.
+	///
+	/// - Note: The generated date will be between January 1, 1970 and
+	///   approximately February 7, 2106 due to the `UInt32` range limitation.
+	public static func random() -> Date {
+		Date(timeIntervalSince1970: .random(in: 0 ..< TimeInterval(UInt32.max)))
 	}
 
 	/// Converts `self` to its textual representation that contains both the date and time parts. The exact format depends on the user's preferences.

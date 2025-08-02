@@ -11,7 +11,7 @@ extension String {
 
 extension [String] {
 	public static func random(
-		count: Int
+		count: Int = Int.random(in: 1 ... 20)
 	) -> [String] {
 		return (0 ..< count).map { _ in
 			String.random()
