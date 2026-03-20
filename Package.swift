@@ -2,6 +2,11 @@
 
 import PackageDescription
 
+private let SnapshotTesting = Target.Dependency.product(
+	name: "SnapshotTesting",
+	package: "swift-snapshot-testing"
+)
+
 private let Tagged = Target.Dependency.product(
 	name: "Tagged",
 	package: "swift-tagged"
@@ -36,6 +41,10 @@ let package = Package(
 			from: "1.25.2"
 		),
 		.package(
+			url: "https://github.com/pointfreeco/swift-snapshot-testing",
+			from: "1.17.0"
+		),
+		.package(
 			url: "https://github.com/pointfreeco/swift-tagged",
 			from: "0.10.0"
 		),
@@ -45,6 +54,7 @@ let package = Package(
 			name: "BrzzTestUtils",
 			dependencies: [
 				"BrzzUtils",
+				SnapshotTesting,
 			]
 		),
 		.testTarget(
