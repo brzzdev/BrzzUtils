@@ -12,7 +12,7 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 	public static func imageWithLocale(
 		on config: ViewImageConfig,
 		perceptualPrecision: Float = 1,
-		traits: UITraitCollection = .init()
+		traits: UITraitCollection = UITraitCollection()
 	) -> Snapshotting {
 		var strategy: Snapshotting = .image(
 			on: config,
@@ -33,7 +33,7 @@ extension View {
 	public func assertSnapshotWithLocale(
 		on config: ViewImageConfig = .iPhone13,
 		perceptualPrecision: Float = 1,
-		traits: UITraitCollection = .init(),
+		traits: UITraitCollection = UITraitCollection(),
 		record: SnapshotTestingConfiguration.Record? = nil,
 		fileID: StaticString = #fileID,
 		file: StaticString = #filePath,
