@@ -1,0 +1,2 @@
+child_config: .swiftlint_child.yml
+parent_config: https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/swiftlint.yml
