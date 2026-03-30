@@ -7,7 +7,7 @@ extension GraphQL {
 			public let column: Int
 		}
 
-		public let locations: [ErrorLocation]?
+		public let locations: [ErrorLocation]? // swiftlint:disable:this discouraged_optional_collection
 		public let message: String
 		public let status: Int?
 

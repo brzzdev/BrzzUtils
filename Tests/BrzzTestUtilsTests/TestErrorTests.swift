@@ -79,7 +79,7 @@ struct TestErrorTests {
 
 	@Test
 	func equatable() {
-		#expect(TestError.networkError == TestError.networkError)
+		#expect(TestError.networkError == .networkError)
 		#expect(TestError.networkError != TestError.timeoutError)
 
 		let customError1 = TestError.custom(code: 10, message: "Error")

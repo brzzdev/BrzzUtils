@@ -9,6 +9,7 @@ public enum LoadingState: Equatable, Sendable {
 		switch self {
 		case .firstLoad, .refreshing:
 			return true
+
 		case .loaded:
 			return false
 		}
