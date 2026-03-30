@@ -27,26 +27,41 @@ extension UserDefaults {
 }
 
 extension UserDefaults.Dependency: DependencyKey {
-	public static let liveValue: Self = {
-		let defaults = { @Sendable in
-			@Dependency(\.userDefaultsProvider)
-			var userDefaultsProvider
-			return userDefaultsProvider
+	public static let liveValue = Self(
+		boolForKey: { @Dependency(\.userDefaultsProvider)
+			var ud; return ud.bool(forKey: $0)
+		},
+		dataForKey: { @Dependency(\.userDefaultsProvider)
+			var ud; return ud.data(forKey: $0)
+		},
+		doubleForKey: { @Dependency(\.userDefaultsProvider)
+			var ud; return ud.double(forKey: $0)
+		},
+		integerForKey: { @Dependency(\.userDefaultsProvider)
+			var ud; return ud.integer(forKey: $0)
+		},
+		stringForKey: { @Dependency(\.userDefaultsProvider)
+			var ud; return ud.string(forKey: $0)
+		},
+		remove: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.removeObject(forKey: $0)
+		},
+		setBool: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.set($0, forKey: $1)
+		},
+		setData: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.set($0, forKey: $1)
+		},
+		setDouble: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.set($0, forKey: $1)
+		},
+		setInteger: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.set($0, forKey: $1)
+		},
+		setString: { @Dependency(\.userDefaultsProvider)
+			var ud; ud.set($0, forKey: $1)
 		}
-		return Self(
-			boolForKey: { defaults().bool(forKey: $0) },
-			dataForKey: { defaults().data(forKey: $0) },
-			doubleForKey: { defaults().double(forKey: $0) },
-			integerForKey: { defaults().integer(forKey: $0) },
-			stringForKey: { defaults().string(forKey: $0) },
-			remove: { defaults().removeObject(forKey: $0) },
-			setBool: { defaults().set($0, forKey: $1) },
-			setData: { defaults().set($0, forKey: $1) },
-			setDouble: { defaults().set($0, forKey: $1) },
-			setInteger: { defaults().set($0, forKey: $1) },
-			setString: { defaults().set($0, forKey: $1) }
-		)
-	}()
+	)
 
 	public static let testValue = Self()
 
@@ -61,15 +76,10 @@ extension UserDefaults.Dependency: DependencyKey {
 	} stringForKey: { _ in
 		nil
 	} remove: { _ in
-
 	} setBool: { _, _ in
-
 	} setData: { _, _ in
-
 	} setDouble: { _, _ in
-
 	} setInteger: { _, _ in
-
 	} setString: { _, _ in
 	}
 }
