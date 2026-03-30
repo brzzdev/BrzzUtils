@@ -1,3 +1,5 @@
+swiftformat_base := "/tmp/swiftformat-base"
+
 # Build the package
 build:
     set -o pipefail && xcodebuild build \
@@ -5,9 +7,17 @@ build:
         -destination "platform=macOS" \
         | xcbeautify
 
+[private]
+fetch-swiftformat-config:
+    curl -sL https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/swiftformat -o {{ swiftformat_base }}
+
 # Format Swift sources
-format:
-    swiftformat .
+format: fetch-swiftformat-config
+    mint run swiftformat . --base-config {{ swiftformat_base }}
+
+[private]
+format-staged: fetch-swiftformat-config
+    ./.git-format-staged --formatter "$(mint which swiftformat 2>/dev/null | tail -1) stdin --stdinpath '{}' --base-config {{ swiftformat_base }}" "*.swift"
 
 # Show outdated Swift packages
 outdated:
@@ -27,7 +37,6 @@ test:
 
 # Install developer tools
 tools:
-    curl -o ./.swiftformat https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/swiftformat
     which brew || /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     brew tap Homebrew/bundle
     brew bundle --no-lock install

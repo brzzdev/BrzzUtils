@@ -1,6 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "dependencyDashboard": false,
   "extends": [
     "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "groupName": "Point-Free",
+      "matchSourceUrls": [
+        "https://github.com/pointfreeco/**"
+      ]
+    }
   ]
 }
