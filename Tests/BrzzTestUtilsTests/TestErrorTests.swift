@@ -2,7 +2,6 @@ import BrzzTestUtils
 import Foundation
 import Testing
 
-@Suite
 struct TestErrorTests {
 	@Test
 	func networkErrorDescription() {
@@ -69,7 +68,7 @@ struct TestErrorTests {
 			#expect(!message.isEmpty, "Random error should have a non-empty message")
 			#expect(
 				code >= Int(Int.min) && code <= Int(Int.max),
-				"Random error code should be within the range of Int"
+				"Random error code should be within the range of Int",
 			)
 
 		default:

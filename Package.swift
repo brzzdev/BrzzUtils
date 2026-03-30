@@ -1,20 +1,20 @@
-// swift-tools-version: 6.1
+// swift-tools-version: 6.3
 
 import PackageDescription
 
 private let SnapshotTesting = Target.Dependency.product(
 	name: "SnapshotTesting",
-	package: "swift-snapshot-testing"
+	package: "swift-snapshot-testing",
 )
 
 private let Tagged = Target.Dependency.product(
 	name: "Tagged",
-	package: "swift-tagged"
+	package: "swift-tagged",
 )
 
 private let TCA = Target.Dependency.product(
 	name: "ComposableArchitecture",
-	package: "swift-composable-architecture"
+	package: "swift-composable-architecture",
 )
 
 let package = Package(
@@ -28,25 +28,25 @@ let package = Package(
 	products: [
 		.library(
 			name: "BrzzTestUtils",
-			targets: ["BrzzTestUtils"]
+			targets: ["BrzzTestUtils"],
 		),
 		.library(
 			name: "BrzzUtils",
-			targets: ["BrzzUtils"]
+			targets: ["BrzzUtils"],
 		),
 	],
 	dependencies: [
 		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture",
-			from: "1.25.2"
+			from: "1.25.3",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-snapshot-testing",
-			from: "1.19.1"
+			from: "1.19.2",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-tagged",
-			from: "0.10.0"
+			from: "0.10.0",
 		),
 	],
 	targets: [
@@ -55,22 +55,22 @@ let package = Package(
 			dependencies: [
 				"BrzzUtils",
 				SnapshotTesting,
-			]
+			],
 		),
 		.testTarget(
 			name: "BrzzTestUtilsTests",
-			dependencies: ["BrzzTestUtils"]
+			dependencies: ["BrzzTestUtils"],
 		),
 		.target(
 			name: "BrzzUtils",
 			dependencies: [
 				Tagged,
 				TCA,
-			]
+			],
 		),
 		.testTarget(
 			name: "BrzzUtilsTests",
-			dependencies: ["BrzzUtils"]
+			dependencies: ["BrzzUtils"],
 		),
-	]
+	],
 )

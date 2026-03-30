@@ -27,12 +27,13 @@ extension Date {
 		Date(timeIntervalSince1970: .random(in: 0 ..< TimeInterval(UInt32.max)))
 	}
 
-	/// Converts `self` to its textual representation that contains both the date and time parts. The exact format depends on the user's preferences.
+	/// Converts `self` to its textual representation that contains both the date and time parts. The
+	/// exact format depends on the user's preferences.
 	/// - Parameters:
 	///   - style: The custom style used.
 	/// - Returns: A `String` describing `self`.
 	public func formatted(
-		style: BrzzDateStyle
+		style: BrzzDateStyle,
 	) -> String {
 		switch style {
 		case .dayMonth:
@@ -54,8 +55,7 @@ extension Date {
 				.withColonSeparatorInTime,
 				.withFractionalSeconds,
 			]
-			@Dependency(\.timeZone)
-			var timeZone
+			@Dependency(\.timeZone) var timeZone
 			formatter.timeZone = timeZone
 			return formatter.string(from: self)
 		}

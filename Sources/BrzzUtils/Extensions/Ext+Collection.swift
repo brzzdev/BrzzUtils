@@ -24,7 +24,8 @@ extension Collection where Index == Int {
 	///
 	/// - Parameter index: The position of the element to access. `index` must be greater than or
 	///   equal to zero and less than the number of elements in the collection.
-	/// - Returns: The element at the specified index if it exists, or `nil` if the index is out of bounds.
+	/// - Returns: The element at the specified index if it exists, or `nil` if the index is out of
+	/// bounds.
 	///
 	/// ```swift
 	/// let numbers = [1, 2, 3]
@@ -64,7 +65,8 @@ extension MutableCollection where Index == Int {
 	///
 	/// - Parameter index: The position of the element to access. `index` must be greater than or
 	///   equal to zero and less than the number of elements in the collection.
-	/// - Returns: The element at the specified index if it exists, or `nil` if the index is out of bounds.
+	/// - Returns: The element at the specified index if it exists, or `nil` if the index is out of
+	/// bounds.
 	///
 	/// ```swift
 	/// var numbers = [1, 2, 3]

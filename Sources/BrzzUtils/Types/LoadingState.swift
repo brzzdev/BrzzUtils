@@ -8,10 +8,10 @@ public enum LoadingState: Equatable, Sendable {
 	public var isLoading: Bool {
 		switch self {
 		case .firstLoad, .refreshing:
-			return true
+			true
 
 		case .loaded:
-			return false
+			false
 		}
 	}
 

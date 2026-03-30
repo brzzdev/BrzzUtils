@@ -12,25 +12,25 @@ extension View {
 
 	public func readFrame(
 		in coordinateSpace: CoordinateSpace = .global,
-		onChange: @escaping (CGRect) -> Void
+		onChange: @escaping (CGRect) -> Void,
 	) -> some View {
 		background(
 			GeometryReader { gp in
 				Color.clear
 					.preference(
 						key: FramePreferenceKey.self,
-						value: gp.frame(in: coordinateSpace)
+						value: gp.frame(in: coordinateSpace),
 					)
-			}
+			},
 		)
 		.onPreferenceChange(FramePreferenceKey.self, perform: onChange)
 	}
 }
 
 private struct FirstAppearModifier: ViewModifier {
+	@State private var isFirstAppearance = true
+
 	let action: () async -> Void
-	@State
-	private var isFirstAppearance = true
 
 	func body(content: Content) -> some View {
 		content

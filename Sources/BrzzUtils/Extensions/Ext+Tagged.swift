@@ -3,7 +3,7 @@ import Tagged
 
 extension Tagged where RawValue: FixedWidthInteger {
 	public static func random(
-		in range: ClosedRange<RawValue> = 0 ... 9_999
+		in range: ClosedRange<RawValue> = 0 ... 9_999,
 	) -> Self {
 		Self(rawValue: .random(in: range))
 	}
@@ -21,15 +21,16 @@ extension Tagged where RawValue: FixedWidthInteger {
 
 extension Tagged where RawValue: BinaryFloatingPoint, RawValue.RawSignificand: FixedWidthInteger {
 	public static func random(
-		in range: ClosedRange<RawValue> = 0.0 ... 9_999.0
+		in range: ClosedRange<RawValue> = 0.0 ... 9_999.0,
 	) -> Self {
 		Self(rawValue: .random(in: range))
 	}
 
 	/// Returns a random value in the full floating-point range
 	public static func randomFullRange() -> Self {
-		Self(rawValue: .random(in: -RawValue.greatestFiniteMagnitude ... RawValue
-				.greatestFiniteMagnitude
+		Self(rawValue: .random(
+			in: -RawValue.greatestFiniteMagnitude ... RawValue
+				.greatestFiniteMagnitude,
 		))
 	}
 

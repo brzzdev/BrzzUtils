@@ -6,13 +6,12 @@ public struct CloseButton: View {
 		case text
 	}
 
-	@Environment(\.dismiss)
-	private var dismiss
+	@Environment(\.dismiss) private var dismiss
 
 	private let style: Style
 
 	public init(
-		style: Style = .circle
+		style: Style = .circle,
 	) {
 		self.style = style
 	}
@@ -31,7 +30,7 @@ public struct CloseButton: View {
 				case .text:
 					Text("Close")
 				}
-			}
+			},
 		)
 		.keyboardShortcut(.cancelAction)
 		.accessibilityLabel(Text("Close"))

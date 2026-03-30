@@ -20,11 +20,11 @@ extension MainActor {
 			return MainActor.assumeIsolated {
 				block()
 			}
-		} else {
-			return DispatchQueue.main.sync {
-				MainActor.assumeIsolated {
-					block()
-				}
+		}
+
+		return DispatchQueue.main.sync {
+			MainActor.assumeIsolated {
+				block()
 			}
 		}
 	}

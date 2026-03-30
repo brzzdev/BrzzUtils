@@ -13,16 +13,16 @@ extension OSLogStore {
 	public struct DependencyKey: Sendable {
 		public var _getLogs: @Sendable (
 			_ bundleIdentifier: String,
-			_ scope: OSLogStore.Scope
+			_ scope: OSLogStore.Scope,
 		) async throws -> [OSLogStore.Output]
 
 		public func getLogs(
 			bundleIdentifier: String = Bundle.main.bundleIdentifier!,
-			scope: OSLogStore.Scope = .currentProcessIdentifier
+			scope: OSLogStore.Scope = .currentProcessIdentifier,
 		) async throws -> [OSLogStore.Output] {
 			try await _getLogs(
 				bundleIdentifier: bundleIdentifier,
-				scope: scope
+				scope: scope,
 			)
 		}
 	}
@@ -41,10 +41,10 @@ extension OSLogStore.DependencyKey: DependencyKey {
 					OSLogStore.Output(
 						category: $0.category,
 						date: $0.date.formatted(date: .numeric, time: .standard),
-						message: $0.composedMessage
+						message: $0.composedMessage,
 					)
 				}
-		}
+		},
 	)
 
 	public static let testValue = Self()

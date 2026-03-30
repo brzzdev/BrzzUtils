@@ -12,9 +12,9 @@ public enum TestError: Error, CustomStringConvertible, Equatable {
 	case timeoutError
 
 	/// A generic error representing an unknown error
-	public static let genericError = TestError.custom(
+	public static let genericError = Self.custom(
 		code: 0,
-		message: "An unknown error occurred"
+		message: "An unknown error occurred",
 	)
 
 	public var description: String {

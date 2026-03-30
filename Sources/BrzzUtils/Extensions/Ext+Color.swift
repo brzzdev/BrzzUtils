@@ -7,7 +7,8 @@ extension Color {
 
 		guard
 			let hex = hex?.trimmingCharacters(in: CharacterSet.alphanumerics.inverted),
-			Scanner(string: hex).scanHexInt64(&int) else {
+			Scanner(string: hex).scanHexInt64(&int)
+		else {
 			return nil
 		}
 
@@ -34,7 +35,7 @@ extension Color {
 			red: Double(r) / 255,
 			green: Double(g) / 255,
 			blue: Double(b) / 255,
-			opacity: Double(a) / 255
+			opacity: Double(a) / 255,
 		)
 	}
 }

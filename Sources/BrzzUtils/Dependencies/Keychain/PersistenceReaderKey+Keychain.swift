@@ -6,8 +6,7 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 	private let cancelBag = CancelBag()
 	private let didSave = PassthroughSubject<Value?, Never>()
 	private let key: String
-	@Dependency(\.keychain)
-	private var keychain
+	@Dependency(\.keychain) private var keychain
 
 	public var id: KeychainKeyID {
 		KeychainKeyID(key: key, keychain: keychain)
@@ -20,7 +19,7 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 	public func save(
 		_ value: Value,
 		context: SaveContext,
-		continuation: SaveContinuation
+		continuation: SaveContinuation,
 	) {
 		guard let data = JSONEncoder.safeEncode(value) else {
 			assertionFailure("Failed to encode - \(value)")
@@ -35,14 +34,16 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 
 	public func load(
 		context: LoadContext<Value>,
-		continuation: LoadContinuation<Value>
+		continuation: LoadContinuation<Value>,
 	) {
 		guard
 			let value = keychain.get(key: key),
-			let value: Value = JSONDecoder.safeDecode(value) else {
+			let value: Value = JSONDecoder.safeDecode(value)
+		else {
 			if
 				let initialValue = context.initialValue,
-				let value = JSONEncoder.safeEncode(initialValue) {
+				let value = JSONEncoder.safeEncode(initialValue)
+			{
 				if keychain.set(value, key: key) {
 					didSave.send(initialValue)
 				}
@@ -60,7 +61,7 @@ public struct KeychainKey<Value: Codable & Equatable & Sendable>: SharedKey {
 
 	public func subscribe(
 		context: LoadContext<Value>,
-		subscriber: SharedSubscriber<Value>
+		subscriber: SharedSubscriber<Value>,
 	) -> SharedSubscription {
 		didSave
 			.removeDuplicates()

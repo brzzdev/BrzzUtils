@@ -28,39 +28,28 @@ extension UserDefaults {
 
 extension UserDefaults.Dependency: DependencyKey {
 	public static let liveValue = Self(
-		boolForKey: { @Dependency(\.userDefaultsProvider)
-			var ud; return ud.bool(forKey: $0)
+		boolForKey: { @Dependency(\.userDefaultsProvider) var ud; return ud.bool(forKey: $0)
 		},
-		dataForKey: { @Dependency(\.userDefaultsProvider)
-			var ud; return ud.data(forKey: $0)
+		dataForKey: { @Dependency(\.userDefaultsProvider) var ud; return ud.data(forKey: $0)
 		},
-		doubleForKey: { @Dependency(\.userDefaultsProvider)
-			var ud; return ud.double(forKey: $0)
+		doubleForKey: { @Dependency(\.userDefaultsProvider) var ud; return ud.double(forKey: $0)
 		},
-		integerForKey: { @Dependency(\.userDefaultsProvider)
-			var ud; return ud.integer(forKey: $0)
+		integerForKey: { @Dependency(\.userDefaultsProvider) var ud; return ud.integer(forKey: $0)
 		},
-		stringForKey: { @Dependency(\.userDefaultsProvider)
-			var ud; return ud.string(forKey: $0)
+		stringForKey: { @Dependency(\.userDefaultsProvider) var ud; return ud.string(forKey: $0)
 		},
-		remove: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.removeObject(forKey: $0)
+		remove: { @Dependency(\.userDefaultsProvider) var ud; ud.removeObject(forKey: $0)
 		},
-		setBool: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.set($0, forKey: $1)
+		setBool: { @Dependency(\.userDefaultsProvider) var ud; ud.set($0, forKey: $1)
 		},
-		setData: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.set($0, forKey: $1)
+		setData: { @Dependency(\.userDefaultsProvider) var ud; ud.set($0, forKey: $1)
 		},
-		setDouble: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.set($0, forKey: $1)
+		setDouble: { @Dependency(\.userDefaultsProvider) var ud; ud.set($0, forKey: $1)
 		},
-		setInteger: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.set($0, forKey: $1)
+		setInteger: { @Dependency(\.userDefaultsProvider) var ud; ud.set($0, forKey: $1)
 		},
-		setString: { @Dependency(\.userDefaultsProvider)
-			var ud; ud.set($0, forKey: $1)
-		}
+		setString: { @Dependency(\.userDefaultsProvider) var ud; ud.set($0, forKey: $1)
+		},
 	)
 
 	public static let testValue = Self()

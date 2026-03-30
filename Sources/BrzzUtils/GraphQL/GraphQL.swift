@@ -33,7 +33,7 @@ public enum GraphQL: Sendable {
 		/// - Parameters:
 		///   - String: The name of the field, optionally including arguments
 		///   - [Field]: An array of nested fields
-		indirect case object(String, [Field])
+		indirect case object(String, [Self])
 
 		/// Converts the field to its GraphQL query string representation.
 		/// For scalar fields, returns just the field name.
@@ -41,15 +41,14 @@ public enum GraphQL: Sendable {
 		fileprivate var stringValue: String {
 			switch self {
 			case let .scalar(name):
-				return name
+				name
 
 			case let .object(name, fields):
-				return
-					"""
-					\(name) {
-					\(fields.map(\.stringValue).joined(separator: "\n    "))
-					}
-					"""
+				"""
+				\(name) {
+				\(fields.map(\.stringValue).joined(separator: "\n    "))
+				}
+				"""
 			}
 		}
 	}
@@ -77,7 +76,7 @@ public enum GraphQL: Sendable {
 		///   - fields: An array of fields to be queried
 		public init(
 			operation: String,
-			fields: [Field]
+			fields: [Field],
 		) {
 			self.operation = operation
 			self.fields = fields

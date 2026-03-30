@@ -2,7 +2,8 @@ import Combine
 import ConcurrencyExtras
 import Foundation
 
-/// `CancelBag` is a utility class that stores multiple `AnyCancellable` instances and provides functionalities
+/// `CancelBag` is a utility class that stores multiple `AnyCancellable` instances and provides
+/// functionalities
 /// to handle their lifecycle collectively.
 /// The `AnyCancellable` instances are stored in a thread-safe manner.
 ///
@@ -54,7 +55,8 @@ public struct CancelBag: Sendable {
 	}
 }
 
-/// Extension to `AnyCancellable` class to easily store an `AnyCancellable` instance to a `CancelBag`.
+/// Extension to `AnyCancellable` class to easily store an `AnyCancellable` instance to a
+/// `CancelBag`.
 extension AnyCancellable {
 	/// Stores `AnyCancellable` instance into a `CancelBag`.
 	///

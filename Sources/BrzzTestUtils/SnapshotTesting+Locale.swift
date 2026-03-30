@@ -12,12 +12,12 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 	public static func imageWithLocale(
 		on config: ViewImageConfig,
 		perceptualPrecision: Float = 1,
-		traits: UITraitCollection = UITraitCollection()
+		traits: UITraitCollection = UITraitCollection(),
 	) -> Snapshotting {
 		var strategy: Snapshotting = .image(
 			on: config,
 			perceptualPrecision: perceptualPrecision,
-			traits: traits
+			traits: traits,
 		)
 		strategy.pathExtension = Locale.current.identifier + ".png"
 		return strategy
@@ -39,21 +39,21 @@ extension View {
 		file: StaticString = #filePath,
 		testName: String = #function,
 		line: UInt = #line,
-		column: UInt = #column
+		column: UInt = #column,
 	) {
 		assertSnapshot(
 			of: UIHostingController(rootView: self),
 			as: .imageWithLocale(
 				on: config,
 				perceptualPrecision: perceptualPrecision,
-				traits: traits
+				traits: traits,
 			),
 			record: record,
 			fileID: fileID,
 			file: file,
 			testName: testName,
 			line: line,
-			column: column
+			column: column,
 		)
 	}
 }
@@ -68,7 +68,7 @@ extension Snapshotting where Value == NSView, Format == NSImage {
 	/// An image snapshotting strategy that appends the current locale identifier
 	/// to the snapshot filename, ensuring each locale gets its own reference image.
 	public static func imageWithLocale(
-		perceptualPrecision: Float = 1
+		perceptualPrecision: Float = 1,
 	) -> Snapshotting {
 		var strategy: Snapshotting = .image(perceptualPrecision: perceptualPrecision)
 		strategy.pathExtension = Locale.current.identifier + ".png"
@@ -89,7 +89,7 @@ extension View {
 		file: StaticString = #filePath,
 		testName: String = #function,
 		line: UInt = #line,
-		column: UInt = #column
+		column: UInt = #column,
 	) {
 		let view = NSHostingView(rootView: self)
 		assertSnapshot(
@@ -100,7 +100,7 @@ extension View {
 			file: file,
 			testName: testName,
 			line: line,
-			column: column
+			column: column,
 		)
 	}
 }

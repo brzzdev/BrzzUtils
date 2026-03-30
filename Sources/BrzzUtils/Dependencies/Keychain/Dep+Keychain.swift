@@ -11,8 +11,6 @@ extension DependencyValues {
 
 @DependencyClient
 public struct Keychain: Sendable {
-	private let id = UUID()
-
 	public var clear: @Sendable () -> Bool = {
 		unimplemented("\(Self.self).clear", placeholder: false)
 	}
@@ -25,6 +23,8 @@ public struct Keychain: Sendable {
 	public var set: @Sendable (Data?, _ key: String) -> Bool = { _, _ in
 		unimplemented("\(Self.self).set", placeholder: false)
 	}
+
+	private let id = UUID()
 }
 
 extension Keychain: DependencyKey {
@@ -44,7 +44,7 @@ extension Keychain: DependencyKey {
 				} else {
 					keychain.delete(key)
 				}
-			}
+			},
 		)
 	}()
 
@@ -54,7 +54,7 @@ extension Keychain: DependencyKey {
 		clear: { false },
 		delete: { _ in false },
 		get: { _ in nil },
-		set: { _, _ in false }
+		set: { _, _ in false },
 	)
 }
 
@@ -68,7 +68,7 @@ extension Keychain: Hashable {
 	}
 }
 
-private struct _Keychain: Sendable {
+private struct _Keychain {
 	private enum Const {
 		static let accessible = kSecAttrAccessible as String
 		static let accessibleAfterFirstUnlock = kSecAttrAccessibleAfterFirstUnlock as String
@@ -87,7 +87,7 @@ private struct _Keychain: Sendable {
 			SecItemDelete(
 				[
 					Const.klass: kSecClassGenericPassword,
-				] as CFDictionary
+				] as CFDictionary,
 			) == noErr
 		}
 	}
@@ -105,7 +105,7 @@ private struct _Keychain: Sendable {
 				adding: [
 					Const.matchLimit: kSecMatchLimitOne,
 					Const.returnData: kCFBooleanTrue!,
-				]
+				],
 			)
 
 			var result: AnyObject?
@@ -130,9 +130,9 @@ private struct _Keychain: Sendable {
 					adding: [
 						Const.accessible: Const.accessibleAfterFirstUnlock,
 						Const.valueData: value,
-					]
+					],
 				),
-				nil
+				nil,
 			)
 			return resultCode == noErr
 		}
@@ -140,7 +140,7 @@ private struct _Keychain: Sendable {
 
 	private func getQuery(
 		key: String,
-		adding additionalQueries: [String: Any] = [:]
+		adding additionalQueries: [String: Any] = [:],
 	) -> CFDictionary {
 		var query: [String: Any] = [
 			Const.attrAccount: key,

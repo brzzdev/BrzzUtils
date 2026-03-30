@@ -1,10 +1,9 @@
 @testable import BrzzUtils
 import Testing
 
-@Suite
 struct ExtCollectionTests {
 	@Test
-	func isNotEmpty() async throws {
+	func isNotEmpty() {
 		// GIVEN
 		let nonEmptyArray = [1, 2, 3]
 		let emptyArray = [Int]()

@@ -2,7 +2,6 @@ import BrzzUtils
 import Combine
 import Testing
 
-@Suite
 struct CancelBagTests {
 	@Test
 	func cancelAll() {

@@ -15,12 +15,14 @@ extension Logger {
 		return bundleIdentifier
 	}
 
-	/// This initializer creates a new instance of `Logger` using the `bundleIdentifier` of the main app bundle as the
-	/// `subsystem`. If, for any reason, the `bundleIdentifier` is not available, it falls back to a stable default.
+	/// This initializer creates a new instance of `Logger` using the `bundleIdentifier` of the main
+	/// app bundle as the
+	/// `subsystem`. If, for any reason, the `bundleIdentifier` is not available, it falls back to a
+	/// stable default.
 	public init(category: String) {
 		self.init(
 			subsystem: Self.subsystem,
-			category: category
+			category: category,
 		)
 	}
 

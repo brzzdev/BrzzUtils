@@ -11,6 +11,6 @@ extension URLResponse {
 	/// Returns `true` if the status code is in the range 200-299, `false` otherwise.
 	/// Also returns `false` if the response is not an HTTP response.
 	public var isSuccessful: Bool {
-		return (200 ... 299).contains(httpStatusCode)
+		(200 ... 299).contains(httpStatusCode)
 	}
 }
