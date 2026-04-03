@@ -38,7 +38,7 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/pointfreeco/swift-composable-architecture",
-			from: "1.25.3",
+			from: "1.25.5",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-snapshot-testing",
