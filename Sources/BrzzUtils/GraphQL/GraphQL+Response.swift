@@ -6,5 +6,7 @@ extension GraphQL {
 		public let errors: [Error]? // swiftlint:disable:this discouraged_optional_collection
 	}
 
-	public struct NoResponse: Decodable, Sendable {}
+	public struct NoResponse: Decodable, Sendable {
+		public init() {}
+	}
 }
