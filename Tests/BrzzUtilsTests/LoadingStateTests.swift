@@ -15,37 +15,47 @@ struct LoadingStateTests {
 		// GIVEN
 		var firstLoad = LoadingState.firstLoad
 		var loaded = LoadingState.loaded
+		// Recovering from a failure never returns to `.firstLoad`.
+		var failed = LoadingState.failed(message: "boom")
 
 		// WHEN
 		firstLoad.setLoading(true)
 		loaded.setLoading(true)
+		failed.setLoading(true)
 
 		// THEN
 		#expect(firstLoad == .firstLoad)
 		#expect(loaded == .refreshing)
+		#expect(failed == .refreshing)
 	}
 
 	@Test
 	func setLoadingFalseMarksLoaded() {
 		// GIVEN
-		var state = LoadingState.refreshing
+		var refreshing = LoadingState.refreshing
+		var failed = LoadingState.failed(message: "boom")
 
 		// WHEN
-		state.setLoading(false)
+		refreshing.setLoading(false)
+		failed.setLoading(false)
 
 		// THEN
-		#expect(state == .loaded)
+		#expect(refreshing == .loaded)
+		#expect(failed == .loaded)
 	}
 
 	@Test
-	func failStoresTheMessage() {
+	func failStoresTheMessageFromAnyState() {
 		// GIVEN
-		var state = LoadingState.firstLoad
+		var firstLoad = LoadingState.firstLoad
+		var loaded = LoadingState.loaded
 
 		// WHEN
-		state.fail(message: "Network error")
+		firstLoad.fail(message: "Network error")
+		loaded.fail(message: "Network error")
 
 		// THEN
-		#expect(state == .failed(message: "Network error"))
+		#expect(firstLoad == .failed(message: "Network error"))
+		#expect(loaded == .failed(message: "Network error"))
 	}
 }
