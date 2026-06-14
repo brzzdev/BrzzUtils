@@ -1,4 +1,4 @@
-import IdentifiedCollections
+public import IdentifiedCollections
 
 extension IdentifiedArray {
 	@inlinable

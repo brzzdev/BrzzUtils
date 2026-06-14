@@ -1,4 +1,4 @@
-import SwiftUI
+public import SwiftUI
 
 public struct CloseButton: View {
 	public enum Style {

@@ -1,6 +1,6 @@
 #if canImport(UIKit)
-import SnapshotTesting
-import SwiftUI
+public import SnapshotTesting
+public import SwiftUI
 import UIKit
 
 extension Snapshotting where Value == UIViewController, Format == UIImage {
@@ -61,8 +61,8 @@ extension View {
 
 #if canImport(AppKit) && !targetEnvironment(macCatalyst)
 import AppKit
-import SnapshotTesting
-import SwiftUI
+public import SnapshotTesting
+public import SwiftUI
 
 extension Snapshotting where Value == NSView, Format == NSImage {
 	/// An image snapshotting strategy that appends the current locale identifier

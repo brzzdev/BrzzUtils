@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 extension Data {
 	public var prettyPrinted: String {

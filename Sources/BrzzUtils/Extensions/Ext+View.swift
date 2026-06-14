@@ -1,4 +1,4 @@
-import SwiftUI
+public import SwiftUI
 
 extension View {
 	public func alignFrame(_ alignment: TextAlignment) -> some View {

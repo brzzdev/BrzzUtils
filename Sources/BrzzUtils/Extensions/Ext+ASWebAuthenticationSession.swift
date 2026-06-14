@@ -1,5 +1,5 @@
-import AuthenticationServices
-import Foundation
+public import AuthenticationServices
+public import Foundation
 
 extension ASWebAuthenticationSession {
 	private final class PresentationContextProviding: NSObject,

@@ -1,4 +1,4 @@
-import Combine
+public import Combine
 
 extension AnyPublisher: @retroactive @unchecked Sendable where Output: Sendable,
 	Failure: Sendable {}

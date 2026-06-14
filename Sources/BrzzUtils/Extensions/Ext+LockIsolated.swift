@@ -1,4 +1,4 @@
-import ConcurrencyExtras
+public import ConcurrencyExtras
 import Foundation
 
 extension LockIsolated {
