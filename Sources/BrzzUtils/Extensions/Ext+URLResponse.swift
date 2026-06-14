@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 extension URLResponse {
 	/// The HTTP status code of the response.

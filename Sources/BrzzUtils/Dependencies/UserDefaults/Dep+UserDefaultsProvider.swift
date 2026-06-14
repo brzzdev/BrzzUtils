@@ -1,6 +1,6 @@
-import Dependencies
+public import Dependencies
 import DependenciesMacros
-import Foundation
+public import Foundation
 
 extension DependencyValues {
 	public var userDefaultsProvider: UserDefaults {

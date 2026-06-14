@@ -1,5 +1,5 @@
 import Dependencies
-import Foundation
+public import Foundation
 
 extension Date {
 	public enum BrzzDateStyle {

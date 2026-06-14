@@ -1,4 +1,4 @@
-import Combine
+public import Combine
 import ConcurrencyExtras
 import Foundation
 

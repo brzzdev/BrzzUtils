@@ -1,4 +1,4 @@
-import SwiftUI
+public import SwiftUI
 
 public struct AssertionFailureView: View {
 	public init(message: String = "") {

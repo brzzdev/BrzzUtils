@@ -1,5 +1,5 @@
 import Foundation
-import OSLog
+public import OSLog
 
 extension Logger {
 	private static let fallbackSubsystem = "dev.brzz.unknown"
@@ -37,7 +37,7 @@ extension Logger {
 		return Logger(category: String(moduleName))
 	}
 
-	public func error(_ error: Error) {
+	public func error(_ error: any Error) {
 		self.error("\(error)")
 	}
 }

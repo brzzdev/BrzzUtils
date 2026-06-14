@@ -1,5 +1,5 @@
-import Combine
-import Foundation
+public import Combine
+public import Foundation
 
 extension TopLevelDecoder where Input == Data {
 	public func safeDecode<T: Decodable>(_ data: Data) -> T? {

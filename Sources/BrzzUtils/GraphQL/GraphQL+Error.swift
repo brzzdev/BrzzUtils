@@ -1,4 +1,4 @@
-import Foundation
+public import Foundation
 
 extension GraphQL {
 	public struct Error: Decodable, LocalizedError {

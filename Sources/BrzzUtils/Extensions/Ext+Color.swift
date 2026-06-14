@@ -1,5 +1,5 @@
 import Dependencies
-import SwiftUI
+public import SwiftUI
 
 extension Color {
 	public init?(hex: String?) {

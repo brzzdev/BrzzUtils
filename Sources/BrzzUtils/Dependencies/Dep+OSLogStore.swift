@@ -1,5 +1,5 @@
-import ComposableArchitecture
-import OSLog
+public import ComposableArchitecture
+public import OSLog
 
 extension DependencyValues {
 	public var osLogStore: OSLogStore.DependencyKey {

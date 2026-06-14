@@ -1,5 +1,5 @@
 import Foundation
-import Tagged
+public import Tagged
 
 extension Tagged where RawValue: FixedWidthInteger {
 	public static func random(
