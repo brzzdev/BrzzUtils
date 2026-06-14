@@ -1,6 +1,7 @@
 import Foundation
 
 public enum LoadingState: Equatable, Sendable {
+	case failed(message: String)
 	case firstLoad
 	case loaded
 	case refreshing
@@ -10,7 +11,7 @@ public enum LoadingState: Equatable, Sendable {
 		case .firstLoad, .refreshing:
 			true
 
-		case .loaded:
+		case .failed, .loaded:
 			false
 		}
 	}
@@ -23,5 +24,9 @@ public enum LoadingState: Equatable, Sendable {
 		} else {
 			self = .loaded
 		}
+	}
+
+	public mutating func fail(message: String) {
+		self = .failed(message: message)
 	}
 }
