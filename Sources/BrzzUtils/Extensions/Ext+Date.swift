@@ -37,12 +37,20 @@ extension Date {
 	) -> String {
 		switch style {
 		case .dayMonth:
+			@Dependency(\.locale) var locale
+			@Dependency(\.timeZone) var timeZone
 			let formatter = DateFormatter()
+			formatter.locale = locale
+			formatter.timeZone = timeZone
 			formatter.setLocalizedDateFormatFromTemplate("dd/MM")
 			return formatter.string(from: self)
 
 		case .dayMonthTime:
+			@Dependency(\.locale) var locale
+			@Dependency(\.timeZone) var timeZone
 			let formatter = DateFormatter()
+			formatter.locale = locale
+			formatter.timeZone = timeZone
 			formatter.setLocalizedDateFormatFromTemplate("dd/MM HH:mm")
 			return formatter.string(from: self)
 
