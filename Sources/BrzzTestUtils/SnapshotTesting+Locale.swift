@@ -4,13 +4,16 @@ public import SwiftUI
 import UIKit
 
 extension Snapshotting where Value == UIViewController, Format == UIImage {
-	/// An image snapshotting strategy that appends the current locale identifier
-	/// to the snapshot filename, ensuring each locale gets its own reference image.
+	/// An image snapshotting strategy that appends a fixed locale identifier to
+	/// the snapshot filename so references are reproducible across machines.
 	///
-	/// This prevents snapshot mismatches when tests run on machines with different
-	/// system locales (e.g. local development vs CI).
+	/// The reference is keyed to `locale` (not the ambient system locale), so a
+	/// UK dev machine and a US-region CI runner resolve the same file. Pair this
+	/// with `.dependency(\.locale, locale)` and `.dependency(\.timeZone, …)` in
+	/// the test suite so the rendered content is deterministic too.
 	public static func imageWithLocale(
 		on config: ViewImageConfig,
+		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
 		traits: UITraitCollection = UITraitCollection(),
 	) -> Snapshotting {
@@ -19,7 +22,7 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 			perceptualPrecision: perceptualPrecision,
 			traits: traits,
 		)
-		strategy.pathExtension = Locale.current.identifier + ".png"
+		strategy.pathExtension = locale.identifier + ".png"
 		return strategy
 	}
 }
@@ -28,10 +31,11 @@ extension View {
 	/// Asserts a snapshot of this view using a locale-aware strategy.
 	///
 	/// Wraps the view in a `UIHostingController` and uses `imageWithLocale`
-	/// so each system locale produces its own reference image.
+	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
 	@MainActor
 	public func assertSnapshotWithLocale(
 		on config: ViewImageConfig = .iPhone13,
+		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
 		traits: UITraitCollection = UITraitCollection(),
 		record: SnapshotTestingConfiguration.Record? = nil,
@@ -45,6 +49,7 @@ extension View {
 			of: UIHostingController(rootView: self),
 			as: .imageWithLocale(
 				on: config,
+				locale: locale,
 				perceptualPrecision: perceptualPrecision,
 				traits: traits,
 			),
@@ -65,13 +70,14 @@ public import SnapshotTesting
 public import SwiftUI
 
 extension Snapshotting where Value == NSView, Format == NSImage {
-	/// An image snapshotting strategy that appends the current locale identifier
-	/// to the snapshot filename, ensuring each locale gets its own reference image.
+	/// An image snapshotting strategy that appends a fixed locale identifier to
+	/// the snapshot filename so references are reproducible across machines.
 	public static func imageWithLocale(
+		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
 	) -> Snapshotting {
 		var strategy: Snapshotting = .image(perceptualPrecision: perceptualPrecision)
-		strategy.pathExtension = Locale.current.identifier + ".png"
+		strategy.pathExtension = locale.identifier + ".png"
 		return strategy
 	}
 }
@@ -80,9 +86,10 @@ extension View {
 	/// Asserts a snapshot of this view using a locale-aware strategy.
 	///
 	/// Wraps the view in an `NSHostingView` and uses `imageWithLocale`
-	/// so each system locale produces its own reference image.
+	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
 	@MainActor
 	public func assertSnapshotWithLocale(
+		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
 		record: SnapshotTestingConfiguration.Record? = nil,
 		fileID: StaticString = #fileID,
@@ -94,7 +101,7 @@ extension View {
 		let view = NSHostingView(rootView: self)
 		assertSnapshot(
 			of: view,
-			as: .imageWithLocale(perceptualPrecision: perceptualPrecision),
+			as: .imageWithLocale(locale: locale, perceptualPrecision: perceptualPrecision),
 			record: record,
 			fileID: fileID,
 			file: file,
