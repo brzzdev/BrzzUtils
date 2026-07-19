@@ -1,3 +1,33 @@
+#if canImport(UIKit) || canImport(AppKit)
+public import SwiftUI
+
+/// Builds the reference filename for a snapshot from the axes it was rendered at.
+///
+/// `testName` arrives as `#function`, which reads `foo()` for a plain test and
+/// `foo(scheme:)` for a parameterised one; truncating at the first `(` makes both
+/// yield the same base, so a suite can be parameterised without renaming its
+/// references.
+///
+/// The colour scheme is always encoded, so no filename implicitly means light.
+/// Every other axis is encoded only when it differs from its default, so adding a
+/// future axis renames nothing that does not use it.
+///
+/// Tokens come from the enum case names (`light`, `accessibility2`), which is why
+/// changing an axis' default is a corpus-wide rename.
+func snapshotName(
+	testName: String,
+	scheme: ColorScheme,
+	dynamicTypeSize: DynamicTypeSize,
+) -> String {
+	var name = String(testName.prefix { $0 != "(" })
+	name += "_\(scheme)"
+	if dynamicTypeSize != .large {
+		name += "_\(dynamicTypeSize)"
+	}
+	return name
+}
+#endif
+
 #if canImport(UIKit)
 public import SnapshotTesting
 public import SwiftUI
@@ -15,12 +45,10 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 		on config: ViewImageConfig,
 		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
-		traits: UITraitCollection = UITraitCollection(),
 	) -> Snapshotting {
 		var strategy: Snapshotting = .image(
 			on: config,
 			perceptualPrecision: perceptualPrecision,
-			traits: traits,
 		)
 		strategy.pathExtension = locale.identifier + ".png"
 		return strategy
@@ -32,12 +60,22 @@ extension View {
 	///
 	/// Wraps the view in a `UIHostingController` and uses `imageWithLocale`
 	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
+	///
+	/// Appearance and Dynamic Type are applied through the SwiftUI environment and
+	/// are *always* applied, so a snapshot never renders against whatever ambient
+	/// state the shared snapshot window happens to hold. Deliberately there is no
+	/// `traits:` escape hatch: `UITraitCollection(userInterfaceStyle:)` sets
+	/// `overrideUserInterfaceStyle` on that shared window, which outlives the
+	/// assertion and leaks into later suites' references.
+	///
+	/// The reference filename encodes the axes — see `snapshotName(testName:…)`.
 	@MainActor
 	public func assertSnapshotWithLocale(
 		on config: ViewImageConfig = .iPhone13,
+		dynamicTypeSize: DynamicTypeSize = .large,
 		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
-		traits: UITraitCollection = UITraitCollection(),
+		scheme: ColorScheme = .light,
 		record: SnapshotTestingConfiguration.Record? = nil,
 		fileID: StaticString = #fileID,
 		file: StaticString = #filePath,
@@ -45,18 +83,25 @@ extension View {
 		line: UInt = #line,
 		column: UInt = #column,
 	) {
+		let rootView =
+			environment(\.colorScheme, scheme)
+				.dynamicTypeSize(dynamicTypeSize)
+
 		assertSnapshot(
-			of: UIHostingController(rootView: self),
+			of: UIHostingController(rootView: rootView),
 			as: .imageWithLocale(
 				on: config,
 				locale: locale,
 				perceptualPrecision: perceptualPrecision,
-				traits: traits,
 			),
 			record: record,
 			fileID: fileID,
 			file: file,
-			testName: testName,
+			testName: snapshotName(
+				testName: testName,
+				scheme: scheme,
+				dynamicTypeSize: dynamicTypeSize,
+			),
 			line: line,
 			column: column,
 		)
@@ -87,10 +132,16 @@ extension View {
 	///
 	/// Wraps the view in an `NSHostingView` and uses `imageWithLocale`
 	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
+	///
+	/// Appearance and Dynamic Type are applied through the SwiftUI environment and
+	/// are always applied, matching the UIKit overload so both platforms key their
+	/// references the same way.
 	@MainActor
 	public func assertSnapshotWithLocale(
+		dynamicTypeSize: DynamicTypeSize = .large,
 		locale: Locale = Locale(identifier: "en_GB"),
 		perceptualPrecision: Float = 1,
+		scheme: ColorScheme = .light,
 		record: SnapshotTestingConfiguration.Record? = nil,
 		fileID: StaticString = #fileID,
 		file: StaticString = #filePath,
@@ -98,14 +149,21 @@ extension View {
 		line: UInt = #line,
 		column: UInt = #column,
 	) {
-		let view = NSHostingView(rootView: self)
+		let rootView =
+			environment(\.colorScheme, scheme)
+				.dynamicTypeSize(dynamicTypeSize)
+
 		assertSnapshot(
-			of: view,
+			of: NSHostingView(rootView: rootView),
 			as: .imageWithLocale(locale: locale, perceptualPrecision: perceptualPrecision),
 			record: record,
 			fileID: fileID,
 			file: file,
-			testName: testName,
+			testName: snapshotName(
+				testName: testName,
+				scheme: scheme,
+				dynamicTypeSize: dynamicTypeSize,
+			),
 			line: line,
 			column: column,
 		)
