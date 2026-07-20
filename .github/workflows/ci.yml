@@ -30,20 +30,28 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      # Key the cache to the resolved Xcode build so a `latest-stable` bump can
+      # never restore DerivedData whose SwiftSyntax macro binaries were compiled
+      # against the previous toolchain (they fail with "unable to resolve Swift
+      # module dependency to a compatible module"). Runs after Setup Xcode so the
+      # version is known before the cache is restored.
+      - name: Capture Xcode version
+        run: echo "XCODE_BUILD=$(xcodebuild -version | tail -n1 | awk '{print $NF}')" >> "$GITHUB_ENV"
+
       - name: Cache Xcode
         uses: actions/cache@v5
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
-          key: ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.platform }}-xcode-
-
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
+            ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-
 
       - name: Install brew
         run: brew bundle
