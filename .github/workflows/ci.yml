@@ -43,13 +43,20 @@ jobs:
       - name: Capture Xcode version
         run: echo "XCODE_BUILD=$(xcodebuild -version | tail -n1 | awk '{print $NF}')" >> "$GITHUB_ENV"
 
-      - name: Cache Xcode
-        uses: actions/cache@v6
+      # Restore on every run, but only save on main. A cache written on a PR ref
+      # is readable solely by that PR, while one written on main is readable by
+      # every branch — so PR saves cost ~31s per matrix leg and ~1GB of quota to
+      # populate an entry almost nothing reads. Measured over a fortnight of
+      # runs, no run ever restored a refs/pull/* entry; PRs were served by
+      # main's cache, and each merge then re-saved the same key anyway.
+      - name: Restore Xcode cache
+        id: cache
+        uses: actions/cache/restore@v6
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
             ~/Library/Caches/org.swift.swiftpm
-          key: ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
+          key: ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-${{ hashFiles('Package.swift') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-
 
@@ -67,3 +74,14 @@ jobs:
           -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
           -resultBundlePath TestResults-${{ matrix.platform }} \
           | xcbeautify
+
+      # Must run after the build, and only when the exact key was missed —
+      # actions/cache/save has no restore step to skip itself.
+      - name: Save Xcode cache
+        if: github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData
+            ~/Library/Caches/org.swift.swiftpm
+          key: ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-${{ hashFiles('Package.swift') }}
