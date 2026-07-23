@@ -153,8 +153,15 @@ extension View {
 			environment(\.colorScheme, scheme)
 				.dynamicTypeSize(dynamicTypeSize)
 
+		// NSHostingView starts life at a zero frame — unlike UIHostingController on
+		// the UIKit path, nothing lays it out before snapshotting, so the image
+		// strategy would fatal-error at size (0, 0). Size it to the SwiftUI content's
+		// fitting size so the reference renders at the view's ideal dimensions.
+		let hostingView = NSHostingView(rootView: rootView)
+		hostingView.frame.size = hostingView.fittingSize
+
 		assertSnapshot(
-			of: NSHostingView(rootView: rootView),
+			of: hostingView,
 			as: .imageWithLocale(locale: locale, perceptualPrecision: perceptualPrecision),
 			record: record,
 			fileID: fileID,
