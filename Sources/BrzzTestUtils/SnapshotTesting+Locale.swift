@@ -114,7 +114,7 @@ import AppKit
 public import SnapshotTesting
 public import SwiftUI
 
-extension Snapshotting where Value == NSView, Format == NSImage {
+extension Snapshotting where Value == NSImage, Format == NSImage {
 	/// An image snapshotting strategy that appends a fixed locale identifier to
 	/// the snapshot filename so references are reproducible across machines.
 	public static func imageWithLocale(
@@ -127,11 +127,44 @@ extension Snapshotting where Value == NSView, Format == NSImage {
 	}
 }
 
+/// Rasterises `view` into an image at a fixed scale so the reference is
+/// reproducible on any machine.
+///
+/// `NSView`'s own display caching draws at the backing scale of whatever screen
+/// the process happens to see — 2× on a Retina dev Mac, 1× on a headless CI
+/// runner — so snapshotting the view directly bakes the recording machine's
+/// scale into the reference and mismatches everywhere else. Drawing into a
+/// bitmap whose pixel dimensions we fix (points × `scale`) pins the output; the
+/// bitmap's own colour space keeps the pixels deterministic too, rather than
+/// following the display's.
+@MainActor
+private func fixedScaleImage(of view: NSView, scale: CGFloat) -> NSImage {
+	let size = view.bounds.size
+	let rep = NSBitmapImageRep(
+		bitmapDataPlanes: nil,
+		pixelsWide: Int((size.width * scale).rounded()),
+		pixelsHigh: Int((size.height * scale).rounded()),
+		bitsPerSample: 8,
+		samplesPerPixel: 4,
+		hasAlpha: true,
+		isPlanar: false,
+		colorSpaceName: .deviceRGB,
+		bytesPerRow: 0,
+		bitsPerPixel: 0,
+	)!
+	rep.size = size
+	view.cacheDisplay(in: view.bounds, to: rep)
+	let image = NSImage(size: size)
+	image.addRepresentation(rep)
+	return image
+}
+
 extension View {
 	/// Asserts a snapshot of this view using a locale-aware strategy.
 	///
-	/// Wraps the view in an `NSHostingView` and uses `imageWithLocale`
-	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
+	/// Wraps the view in an `NSHostingView`, rasterises it at a fixed scale, and
+	/// uses `imageWithLocale` so the reference filename is keyed to a fixed locale
+	/// (default `en_GB`).
 	///
 	/// Appearance and Dynamic Type are applied through the SwiftUI environment and
 	/// are always applied, matching the UIKit overload so both platforms key their
@@ -154,14 +187,15 @@ extension View {
 				.dynamicTypeSize(dynamicTypeSize)
 
 		// NSHostingView starts life at a zero frame — unlike UIHostingController on
-		// the UIKit path, nothing lays it out before snapshotting, so the image
-		// strategy would fatal-error at size (0, 0). Size it to the SwiftUI content's
-		// fitting size so the reference renders at the view's ideal dimensions.
+		// the UIKit path, nothing lays it out before snapshotting. Size it to the
+		// SwiftUI content's fitting size, then rasterise at a fixed scale so the
+		// reference is identical on a Retina dev Mac and a 1× CI runner.
 		let hostingView = NSHostingView(rootView: rootView)
 		hostingView.frame.size = hostingView.fittingSize
+		let image = fixedScaleImage(of: hostingView, scale: 2)
 
 		assertSnapshot(
-			of: hostingView,
+			of: image,
 			as: .imageWithLocale(locale: locale, perceptualPrecision: perceptualPrecision),
 			record: record,
 			fileID: fileID,

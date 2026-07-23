@@ -27,8 +27,11 @@ struct AppKitSnapshotTests {
 
 	@Test(arguments: [ColorScheme.light, .dark])
 	func swatch(scheme: ColorScheme) {
+		// A slightly relaxed perceptualPrecision absorbs sub-perceptual colour
+		// differences between the recording machine and CI while still catching
+		// the light-vs-dark flip the test exists to prove.
 		Swatch()
-			.assertSnapshotWithLocale(scheme: scheme)
+			.assertSnapshotWithLocale(perceptualPrecision: 0.98, scheme: scheme)
 	}
 }
 #endif
