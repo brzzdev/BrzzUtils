@@ -18,6 +18,10 @@ jobs:
     name: Test ${{ matrix.platform }}
     runs-on: macos-26
     strategy:
+      # Let each platform leg finish independently: a macOS failure should not
+      # cancel the still-running iOS leg (or vice versa), so a red run reports
+      # every real failure rather than one plus a cascade of cancellations.
+      fail-fast: false
       matrix:
         platform: [iOS, macOS]
         include:
@@ -74,6 +78,17 @@ jobs:
           -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
           -resultBundlePath TestResults-${{ matrix.platform }} \
           | xcbeautify
+
+      # On failure, keep the result bundle so a snapshot mismatch's full
+      # message (image sizes, perceptual diff) and the newly-taken image are
+      # inspectable — xcbeautify collapses them to "recorded an issue" in the log.
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TestResults-${{ matrix.platform }}
+          path: TestResults-${{ matrix.platform }}.xcresult
+          retention-days: 7
 
       # Must run after the build, and only when the exact key was missed —
       # actions/cache/save has no restore step to skip itself.
