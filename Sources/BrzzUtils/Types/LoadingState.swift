@@ -40,4 +40,18 @@ public enum LoadingState: Equatable, Sendable {
 	public mutating func fail(message: String) {
 		self = .failed(message: message)
 	}
+
+	/// Enters `.failed` only when there is nothing on screen; otherwise finishes loading and leaves
+	/// the already-loaded content up.
+	///
+	/// This is the invariant `setLoading(_:)` relies on — that `.failed` is only ever entered with
+	/// nothing to show — expressed as the call consumers actually make on an error path. When there
+	/// is content to keep, `message` is discarded: surfacing it is the caller's job.
+	public mutating func fail(message: String, ifEmpty isEmpty: Bool) {
+		if isEmpty {
+			fail(message: message)
+		} else {
+			setLoading(false)
+		}
+	}
 }

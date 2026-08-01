@@ -61,4 +61,33 @@ struct LoadingStateTests {
 		#expect(loadingWithoutContent == .failed(message: "Network error"))
 		#expect(loaded == .failed(message: "Network error"))
 	}
+
+	@Test
+	func failIfEmptyOnlyTakesOverTheScreenWhenThereIsNothingToShow() {
+		// GIVEN
+		var withoutContent = LoadingState.loadingWithoutContent
+		var withContent = LoadingState.refreshing
+
+		// WHEN
+		withoutContent.fail(message: "Network error", ifEmpty: true)
+		withContent.fail(message: "Network error", ifEmpty: false)
+
+		// THEN
+		#expect(withoutContent == .failed(message: "Network error"))
+		#expect(withContent == .loaded)
+	}
+
+	@Test
+	func failIfEmptyOverContentKeepsTheNextReloadInline() {
+		// GIVEN
+		var state = LoadingState.refreshing
+
+		// WHEN
+		state.fail(message: "Network error", ifEmpty: false)
+		state.setLoading(true)
+
+		// THEN
+		// The content is still on screen, so the spinner stays inline rather than taking over.
+		#expect(state == .refreshing)
+	}
 }
