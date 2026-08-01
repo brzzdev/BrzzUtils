@@ -2,13 +2,13 @@ import Foundation
 
 public enum LoadingState: Equatable, Sendable {
 	case failed(message: String)
-	case firstLoad
 	case loaded
+	case loadingWithoutContent
 	case refreshing
 
 	public var isLoading: Bool {
 		switch self {
-		case .firstLoad, .refreshing:
+		case .loadingWithoutContent, .refreshing:
 			true
 
 		case .failed, .loaded:
@@ -16,15 +16,22 @@ public enum LoadingState: Equatable, Sendable {
 		}
 	}
 
-	/// Transitions to `.refreshing` while loading — or stays on `.firstLoad` when there's no data
-	/// yet — and to `.loaded` when finished. It never re-enters `.firstLoad` or `.failed`: to show a
-	/// full-screen spinner again after a failure, assign `.firstLoad` explicitly rather than calling
-	/// this.
+	/// Transitions to `.refreshing` while loading, or stays on `.loadingWithoutContent` when there's
+	/// nothing on screen to keep — which includes retrying out of `.failed`. Finishing lands on
+	/// `.loaded`, and this never re-enters `.failed`.
+	///
+	/// Retrying out of `.failed` shows a full-screen spinner rather than an inline one, because
+	/// `.failed` should only ever be entered with nothing to show: a refresh that fails over
+	/// already-loaded content is expected to leave that content on screen instead of failing.
 	public mutating func setLoading(_ loading: Bool) {
 		if loading {
-			guard self != .firstLoad else { return }
+			switch self {
+			case .failed, .loadingWithoutContent:
+				self = .loadingWithoutContent
 
-			self = .refreshing
+			case .loaded, .refreshing:
+				self = .refreshing
+			}
 		} else {
 			self = .loaded
 		}
