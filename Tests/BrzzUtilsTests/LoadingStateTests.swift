@@ -11,22 +11,25 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func setLoadingTrueKeepsFirstLoadButOtherwiseRefreshes() {
+	func setLoadingTrueRefreshesOnlyWhenThereIsContentToKeep() {
 		// GIVEN
 		var firstLoad = LoadingState.firstLoad
 		var loaded = LoadingState.loaded
-		// Recovering from a failure never returns to `.firstLoad`.
+		var refreshing = LoadingState.refreshing
+		// A failure is only ever entered with nothing on screen, so retrying is a first load.
 		var failed = LoadingState.failed(message: "boom")
 
 		// WHEN
 		firstLoad.setLoading(true)
 		loaded.setLoading(true)
+		refreshing.setLoading(true)
 		failed.setLoading(true)
 
 		// THEN
 		#expect(firstLoad == .firstLoad)
 		#expect(loaded == .refreshing)
-		#expect(failed == .refreshing)
+		#expect(refreshing == .refreshing)
+		#expect(failed == .firstLoad)
 	}
 
 	@Test
