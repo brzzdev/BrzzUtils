@@ -19,14 +19,19 @@ navigation anywhere in `Sources`. The single file that imported `ComposableArchi
 expensive way to spell `import Dependencies`.
 
 That became load-bearing when the consuming apps wanted to adopt
-[ComposableArchitecture 2.0](https://github.com/pointfreeco/TCA26). At the time of writing
-TCA26 has no tags or releases — only `main` — and it pulls three further branch
-dependencies of its own (swift-case-paths `26`, swift-clocks `clocks-2`, swift-navigation
-`relax-sendable`). SwiftPM does not allow a version-resolved package to depend on a
-branch, so pointing BrzzUtils at TCA26 would have forced every consuming app to pin
-BrzzUtils by branch or revision too, ending its ability to ship stable tags. It would also
-have raised the platform floor from iOS 16 / macOS 13 to iOS 17 / macOS 14, in exchange for
-capabilities this package has no code to use.
+[ComposableArchitecture 2.0](https://github.com/pointfreeco/TCA26).
+
+> **Observed on TCA26 `main`, 2026-08-02.** TCA26 is branch-only and moving; every
+> specific claim about it in this ADR is a snapshot of that day, not a standing fact.
+> Re-check upstream before relying on any of them.
+
+As of that date TCA26 has no tags or releases — only `main` — and it pulls three further
+branch dependencies of its own (swift-case-paths `26`, swift-clocks `clocks-2`,
+swift-navigation `relax-sendable`). SwiftPM does not allow a version-resolved package to
+depend on a branch, so pointing BrzzUtils at TCA26 would have forced every consuming app to
+pin BrzzUtils by branch or revision too, ending its ability to ship stable tags. It also
+declared a platform floor of iOS 17 / macOS 14, raising ours from iOS 16 / macOS 13 in
+exchange for capabilities this package has no code to use.
 
 ## Decision
 
@@ -44,11 +49,14 @@ BrzzUtils is TCA-version-agnostic. It works unchanged under TCA 1.x, under TCA26
 each app adopts TCA 2.0 on its own schedule while BrzzUtils keeps releasing stable SemVer
 tags.
 
-It is also insulated from TCA26's trait system. `ComposableArchitecture2` only vends
-`Dependencies` when the consumer enables the `Dependencies` trait, which is **off** by
-default (`.default(enabledTraits: ["ComposableArchitecture1Deprecations"])`), and it does
-not vend `IdentifiedCollections` or `ConcurrencyExtras` at all. Declaring these packages
-directly means BrzzUtils compiles regardless of how any app configures its traits.
+It is also insulated from TCA26's trait system. On `main` as of 2026-08-02,
+`ComposableArchitecture2` only vends `Dependencies` when the consumer enables the
+`Dependencies` trait, which is **off** by default — the manifest declares
+`.default(enabledTraits: ["ComposableArchitecture1Deprecations"])` — and it does not vend
+`IdentifiedCollections` or `ConcurrencyExtras` at all. Trait names and defaults are exactly
+the kind of thing that changes on an untagged branch; the reason to declare these packages
+directly is that doing so makes BrzzUtils compile regardless of how any app configures its
+traits, whatever those traits end up being called.
 
 The platform floor stays at iOS 16 / macOS 13, and the resolved dependency graph drops from
 16 pins to 11.
@@ -62,7 +70,8 @@ not here.
 ## Revisit when
 
 An app migrates to pure `ComposableArchitecture2` and declines to enable the `Dependencies`
-trait. At that point `Dep+UserDefaults`, `Dep+OSLogStore`, and `Ext+Date` would drag
+trait. At that point the four files that import `Dependencies` — `Dep+OSLogStore`,
+`Dep+UserDefaults`, `Dep+UserDefaultsProvider`, and `Ext+Date` — would drag
 swift-dependencies into an app that deliberately shed it, and the answer is a default-on
 SwiftPM trait guarding those files — not a target split, and not a return to TCA. Deferred
 until a real consumer wants it, because only then will the seam be known.
