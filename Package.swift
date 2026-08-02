@@ -2,6 +2,26 @@
 
 import PackageDescription
 
+private let ConcurrencyExtras = Target.Dependency.product(
+	name: "ConcurrencyExtras",
+	package: "swift-concurrency-extras",
+)
+
+private let Dependencies = Target.Dependency.product(
+	name: "Dependencies",
+	package: "swift-dependencies",
+)
+
+private let DependenciesMacros = Target.Dependency.product(
+	name: "DependenciesMacros",
+	package: "swift-dependencies",
+)
+
+private let IdentifiedCollections = Target.Dependency.product(
+	name: "IdentifiedCollections",
+	package: "swift-identified-collections",
+)
+
 private let SnapshotTesting = Target.Dependency.product(
 	name: "SnapshotTesting",
 	package: "swift-snapshot-testing",
@@ -10,11 +30,6 @@ private let SnapshotTesting = Target.Dependency.product(
 private let Tagged = Target.Dependency.product(
 	name: "Tagged",
 	package: "swift-tagged",
-)
-
-private let TCA = Target.Dependency.product(
-	name: "ComposableArchitecture",
-	package: "swift-composable-architecture",
 )
 
 let package = Package(
@@ -37,8 +52,16 @@ let package = Package(
 	],
 	dependencies: [
 		.package(
-			url: "https://github.com/pointfreeco/swift-composable-architecture",
-			from: "1.26.1",
+			url: "https://github.com/pointfreeco/swift-concurrency-extras",
+			from: "1.4.1",
+		),
+		.package(
+			url: "https://github.com/pointfreeco/swift-dependencies",
+			from: "1.14.1",
+		),
+		.package(
+			url: "https://github.com/pointfreeco/swift-identified-collections",
+			from: "1.1.1",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-snapshot-testing",
@@ -64,8 +87,11 @@ let package = Package(
 		.target(
 			name: "BrzzUtils",
 			dependencies: [
+				ConcurrencyExtras,
+				Dependencies,
+				DependenciesMacros,
+				IdentifiedCollections,
 				Tagged,
-				TCA,
 			],
 		),
 		.testTarget(

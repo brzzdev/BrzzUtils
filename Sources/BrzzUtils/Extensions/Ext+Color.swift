@@ -1,4 +1,3 @@
-import Dependencies
 public import SwiftUI
 
 extension Color {
