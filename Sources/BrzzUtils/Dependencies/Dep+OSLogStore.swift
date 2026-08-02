@@ -1,4 +1,5 @@
-public import ComposableArchitecture
+public import Dependencies
+import DependenciesMacros
 public import OSLog
 
 extension DependencyValues {
