@@ -22,6 +22,11 @@ private let IdentifiedCollections = Target.Dependency.product(
 	package: "swift-identified-collections",
 )
 
+private let IssueReporting = Target.Dependency.product(
+	name: "IssueReporting",
+	package: "xctest-dynamic-overlay",
+)
+
 private let SnapshotTesting = Target.Dependency.product(
 	name: "SnapshotTesting",
 	package: "swift-snapshot-testing",
@@ -71,6 +76,13 @@ let package = Package(
 			url: "https://github.com/pointfreeco/swift-tagged",
 			from: "0.10.0",
 		),
+		.package(
+			// `swift-dependencies` 1.16.0 still uses this identity. Depending on
+			// `swift-issue-reporting` directly would load both packages and give the
+			// graph duplicate `IssueReporting` targets until the 1.12 shim is tagged.
+			url: "https://github.com/pointfreeco/xctest-dynamic-overlay",
+			from: "1.11.0",
+		),
 	],
 	targets: [
 		.target(
@@ -91,6 +103,7 @@ let package = Package(
 				Dependencies,
 				DependenciesMacros,
 				IdentifiedCollections,
+				IssueReporting,
 				Tagged,
 			],
 		),
