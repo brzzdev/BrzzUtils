@@ -22,6 +22,11 @@ private let IdentifiedCollections = Target.Dependency.product(
 	package: "swift-identified-collections",
 )
 
+private let IssueReporting = Target.Dependency.product(
+	name: "IssueReporting",
+	package: "xctest-dynamic-overlay",
+)
+
 private let SnapshotTesting = Target.Dependency.product(
 	name: "SnapshotTesting",
 	package: "swift-snapshot-testing",
@@ -71,6 +76,10 @@ let package = Package(
 			url: "https://github.com/pointfreeco/swift-tagged",
 			from: "0.10.0",
 		),
+		.package(
+			url: "https://github.com/pointfreeco/xctest-dynamic-overlay",
+			from: "1.4.0",
+		),
 	],
 	targets: [
 		.target(
@@ -91,6 +100,7 @@ let package = Package(
 				Dependencies,
 				DependenciesMacros,
 				IdentifiedCollections,
+				IssueReporting,
 				Tagged,
 			],
 		),
