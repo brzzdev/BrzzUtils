@@ -81,7 +81,7 @@ let package = Package(
 			// `swift-issue-reporting` directly would load both packages and give the
 			// graph duplicate `IssueReporting` targets until the 1.12 shim is tagged.
 			url: "https://github.com/pointfreeco/xctest-dynamic-overlay",
-			from: "1.13.0",
+			from: "1.13.1",
 		),
 	],
 	targets: [
