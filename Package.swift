@@ -62,7 +62,7 @@ let package = Package(
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-dependencies",
-			from: "1.17.0",
+			from: "1.17.1",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-identified-collections",
