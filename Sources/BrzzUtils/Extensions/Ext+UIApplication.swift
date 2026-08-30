@@ -3,7 +3,7 @@ public import UIKit
 
 extension UIApplication {
 	public var safeKeyWindow: UIWindow? {
-		UIApplication
+		Self
 			.shared
 			.connectedScenes
 			.compactMap { ($0 as? UIWindowScene)?.keyWindow }

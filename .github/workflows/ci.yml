@@ -79,6 +79,13 @@ jobs:
           -resultBundlePath TestResults-${{ matrix.platform }} \
           | xcbeautify
 
+      # Lint is platform-independent, so it runs on one leg of the matrix rather
+      # than both. Unconditional otherwise, so neither signal masks the other: a
+      # lint failure still reports the test result, and vice versa.
+      - name: Lint
+        if: ${{ !cancelled() && matrix.platform == 'macOS' }}
+        run: just lint
+
       # On failure, keep the result bundle so a snapshot mismatch's full
       # message (image sizes, perceptual diff) and the newly-taken image are
       # inspectable — xcbeautify collapses them to "recorded an issue" in the log.
