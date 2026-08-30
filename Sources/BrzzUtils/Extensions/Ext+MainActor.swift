@@ -3,12 +3,12 @@ import Foundation
 extension MainActor {
 	public static func asap(execute block: @escaping @MainActor @Sendable () -> Void) {
 		if DispatchQueue.getSpecific(key: key) == value {
-			MainActor.assumeIsolated {
+			assumeIsolated {
 				block()
 			}
 		} else {
 			DispatchQueue.main.async {
-				MainActor.assumeIsolated {
+				Self.assumeIsolated {
 					block()
 				}
 			}
@@ -17,13 +17,13 @@ extension MainActor {
 
 	public static func now<R: Sendable>(execute block: @MainActor @Sendable () -> R) -> R {
 		if DispatchQueue.getSpecific(key: key) == value {
-			return MainActor.assumeIsolated {
+			return assumeIsolated {
 				block()
 			}
 		}
 
 		return DispatchQueue.main.sync {
-			MainActor.assumeIsolated {
+			Self.assumeIsolated {
 				block()
 			}
 		}

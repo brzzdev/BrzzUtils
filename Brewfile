@@ -1,3 +1,5 @@
 brew 'git-format-staged'
+brew 'just'
 brew 'mint'
+brew 'swiftlint'
 brew 'xcbeautify'
