@@ -1,2 +1,19 @@
-child_config: .swiftlint_child.yml
+# The shared ruleset. `just lint` passes this file to SwiftLint explicitly, which
+# is what makes a failed fetch of the parent fatal rather than a warning it lints
+# straight past — see the comment on the `lint` recipe.
 parent_config: https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/swiftlint.yml
+
+# Local overrides. These lived in a separate `.swiftlint_child.yml` until they were
+# folded in here: a referenced local config that goes missing is *ignored* by
+# SwiftLint with a warning and a zero exit, silently dropping everything below.
+# Inlined, there is no second file to lose.
+
+deployment_target:
+  iOS_deployment_target: 16.0
+  macOS_deployment_target: 13.0
+  tvOS_deployment_target: 17.0
+  watchOS_deployment_target: 10.0
+
+excluded:
+  - .build
+  - "**/.build"

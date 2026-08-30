@@ -70,7 +70,16 @@ jobs:
       - name: Verify Macros
         run: defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
 
+      # Lint runs before the build. A condition on a later step does not survive a
+      # *job* timeout — GitHub cancels the whole job, so no later step starts and the
+      # lint signal is lost entirely. It is platform-independent, so it runs on one
+      # leg of the matrix rather than both.
+      - name: Lint
+        if: ${{ matrix.platform == 'macOS' }}
+        run: just lint
+
       - name: Build and Test
+        if: '!cancelled()'
         run: |
           set -o pipefail && xcodebuild test \
           -scheme BrzzUtils-Package \
@@ -78,13 +87,6 @@ jobs:
           -derivedDataPath ~/Library/Developer/Xcode/DerivedData \
           -resultBundlePath TestResults-${{ matrix.platform }} \
           | xcbeautify
-
-      # Lint is platform-independent, so it runs on one leg of the matrix rather
-      # than both. Unconditional otherwise, so neither signal masks the other: a
-      # lint failure still reports the test result, and vice versa.
-      - name: Lint
-        if: ${{ !cancelled() && matrix.platform == 'macOS' }}
-        run: just lint
 
       # On failure, keep the result bundle so a snapshot mismatch's full
       # message (image sizes, perceptual diff) and the newly-taken image are
