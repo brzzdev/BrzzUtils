@@ -87,34 +87,21 @@ format-staged: fetch-swiftformat-config
 
 # Fail on a SwiftLint violation, or on the shared config going missing
 lint:
-    #!/usr/bin/env bash
-    # Deliberately not `-e`: the guard below has to run whatever swiftlint returns.
-    set -uo pipefail
-
-    # SwiftLint fetches its own `parent_config`, and a failed fetch is only a
-    # *warning*: it falls back to its built-in default rules and lints on happily
-    # against a rule set that is not ours. Verified on SwiftLint 0.65.1 — with the
-    # parent unreachable and no cached copy, a file carrying `@objcMembers`, which
-    # the shared config bans by custom rule and the defaults allow, lints clean and
-    # exits 0. A gate wired naively passes while checking nothing we asked for.
+    # `--config` is load-bearing, not decoration. With the config merely
+    # discovered, SwiftLint treats a failed `parent_config` fetch as a warning,
+    # falls back to its own built-in defaults and exits 0 — a gate that lints
+    # nothing we asked for. Naming the file explicitly takes SwiftLint's
+    # "explicitly specified ... -> fail" path instead. Verified on 0.65.1:
+    # identical rule set (260 rows of `swiftlint rules`), exit 134 when the
+    # config cannot load, and still exit 0 when it falls back to a cached copy
+    # of our own config.
     #
-    # The match is on the *fallback* clause rather than on "Unable to load remote
-    # config": SwiftLint prints that same prefix when it successfully falls back to
-    # its cached copy, which is our rule set and must not fail the build. Verified
-    # both ways against a local server taken down underneath a populated cache.
-    #
-    # The wording is SwiftLint's to change, so re-check this on a version bump.
-    output="$(swiftlint --strict 2>&1)"
-    status=$?
-    printf '%s\n' "$output"
-
-    if grep -q 'Falling back to default configuration' <<<"$output"; then
-        echo "SwiftLint could not load the shared config and linted against its own defaults, not ours." >&2
-        status=1
-    fi
-
-    exit $status
-
+    # Pass this one file, not the parent and child separately: two `--config`
+    # arguments silently resolve to a *different* rule set — measured, 172 rows
+    # of that table flip. The local overrides are inlined into `.swiftlint.yml`
+    # for the same reason a second file is a liability: a referenced local
+    # config that goes missing is ignored with a warning and a zero exit.
+    swiftlint --strict --config .swiftlint.yml
 # Show outdated Swift packages
 outdated:
     mint run swift-outdated
