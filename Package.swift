@@ -70,7 +70,7 @@ let package = Package(
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-snapshot-testing",
-			from: "1.19.5",
+			from: "1.19.6",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-tagged",
