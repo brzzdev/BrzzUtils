@@ -12,10 +12,10 @@ struct ExtDateTests {
 		// ICU separates the day period with a narrow no-break space.
 		("en_US", "03/16, 1:00\u{202F}PM"),
 	])
-	func dayMonthTimeFollowsLocaleHourCycle(identifier: String, expected: String) throws {
+	func dayMonthTimeFollowsLocaleHourCycle(identifier: String, expected: String) {
 		// GIVEN
 		let locale = Locale(identifier: identifier)
-		let timeZone = try #require(TimeZone(identifier: "UTC"))
+		let timeZone = TimeZone.gmt
 
 		// WHEN
 		let formatted = withDependencies {

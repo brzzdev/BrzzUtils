@@ -48,7 +48,6 @@ extension Date {
 		case .dayMonthTime:
 			@Dependency(\.locale) var locale
 			@Dependency(\.timeZone) var timeZone
-			// `.hour()` follows the locale's hour cycle, so 12-hour locales get "1:00 PM".
 			return formatted(
 				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
 					.day(.twoDigits)
