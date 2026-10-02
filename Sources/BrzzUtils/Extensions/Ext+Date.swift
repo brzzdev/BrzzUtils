@@ -7,7 +7,7 @@ extension Date {
 		/// E.g - "16/03" for UK locale
 		case dayMonth
 		/// Returns a localized string showing the day, month, and time
-		/// E.g - "16/03 13:00" for UK locale
+		/// E.g - "16/03, 13:00" for UK locale, "03/16, 1:00 PM" for US locale
 		case dayMonthTime
 		/// Returns an ISO 8601 formatted string representation of the date
 		/// E.g - "1970-01-01 00:00:00.000"
@@ -48,11 +48,14 @@ extension Date {
 		case .dayMonthTime:
 			@Dependency(\.locale) var locale
 			@Dependency(\.timeZone) var timeZone
-			let formatter = DateFormatter()
-			formatter.locale = locale
-			formatter.timeZone = timeZone
-			formatter.setLocalizedDateFormatFromTemplate("dd/MM HH:mm")
-			return formatter.string(from: self)
+			// `.hour()` follows the locale's hour cycle, so 12-hour locales get "1:00 PM".
+			return formatted(
+				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
+					.day(.twoDigits)
+					.month(.twoDigits)
+					.hour()
+					.minute(),
+			)
 
 		case .iso:
 			let formatter = ISO8601DateFormatter()

@@ -109,7 +109,10 @@ let package = Package(
 		),
 		.testTarget(
 			name: "BrzzUtilsTests",
-			dependencies: ["BrzzUtils"],
+			dependencies: [
+				"BrzzUtils",
+				Dependencies,
+			],
 		),
 	],
 )
