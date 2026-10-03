@@ -4,7 +4,7 @@ public import Foundation
 extension Date {
 	public enum BrzzDateStyle {
 		/// Returns a localized string showing only the day and month
-		/// E.g - "16/03" for UK locale
+		/// E.g - "16/03" for UK locale, "03/16" for US locale
 		case dayMonth
 		/// Returns a localized string showing the day, month, and time
 		/// E.g - "16/03, 13:00" for UK locale, "03/16, 1:00 PM" for US locale
@@ -12,6 +12,16 @@ extension Date {
 		/// Returns an ISO 8601 formatted string representation of the date
 		/// E.g - "1970-01-01 00:00:00.000"
 		case iso
+	}
+
+	/// The day and month in the current locale's order and calendar, which `.dayMonth` and
+	/// `.dayMonthTime` share so the two cannot drift apart.
+	private static var dayMonthStyle: FormatStyle {
+		@Dependency(\.locale) var locale
+		@Dependency(\.timeZone) var timeZone
+		return FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
+			.day(.twoDigits)
+			.month(.twoDigits)
 	}
 
 	/// Generates a random date.
@@ -27,8 +37,8 @@ extension Date {
 		Date(timeIntervalSince1970: .random(in: 0 ..< TimeInterval(UInt32.max)))
 	}
 
-	/// Converts `self` to its textual representation that contains both the date and time parts. The
-	/// exact format depends on the user's preferences.
+	/// Converts `self` to its textual representation in one of the custom styles. The exact format
+	/// depends on the user's preferences.
 	/// - Parameters:
 	///   - style: The custom style used.
 	/// - Returns: A `String` describing `self`.
@@ -37,24 +47,10 @@ extension Date {
 	) -> String {
 		switch style {
 		case .dayMonth:
-			@Dependency(\.locale) var locale
-			@Dependency(\.timeZone) var timeZone
-			let formatter = DateFormatter()
-			formatter.locale = locale
-			formatter.timeZone = timeZone
-			formatter.setLocalizedDateFormatFromTemplate("dd/MM")
-			return formatter.string(from: self)
+			return formatted(Self.dayMonthStyle)
 
 		case .dayMonthTime:
-			@Dependency(\.locale) var locale
-			@Dependency(\.timeZone) var timeZone
-			return formatted(
-				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
-					.day(.twoDigits)
-					.month(.twoDigits)
-					.hour()
-					.minute(),
-			)
+			return formatted(Self.dayMonthStyle.hour().minute())
 
 		case .iso:
 			let formatter = ISO8601DateFormatter()
