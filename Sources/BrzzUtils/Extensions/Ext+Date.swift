@@ -39,11 +39,11 @@ extension Date {
 		case .dayMonth:
 			@Dependency(\.locale) var locale
 			@Dependency(\.timeZone) var timeZone
-			let formatter = DateFormatter()
-			formatter.locale = locale
-			formatter.timeZone = timeZone
-			formatter.setLocalizedDateFormatFromTemplate("dd/MM")
-			return formatter.string(from: self)
+			return formatted(
+				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
+					.day(.twoDigits)
+					.month(.twoDigits),
+			)
 
 		case .dayMonthTime:
 			@Dependency(\.locale) var locale
