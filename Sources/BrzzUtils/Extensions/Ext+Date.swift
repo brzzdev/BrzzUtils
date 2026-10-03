@@ -35,26 +35,18 @@ extension Date {
 	public func formatted(
 		style: BrzzDateStyle,
 	) -> String {
+		@Dependency(\.locale) var locale
+		@Dependency(\.timeZone) var timeZone
+		let dayMonth = Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
+			.day(.twoDigits)
+			.month(.twoDigits)
+
 		switch style {
 		case .dayMonth:
-			@Dependency(\.locale) var locale
-			@Dependency(\.timeZone) var timeZone
-			return formatted(
-				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
-					.day(.twoDigits)
-					.month(.twoDigits),
-			)
+			return formatted(dayMonth)
 
 		case .dayMonthTime:
-			@Dependency(\.locale) var locale
-			@Dependency(\.timeZone) var timeZone
-			return formatted(
-				Self.FormatStyle(locale: locale, calendar: locale.calendar, timeZone: timeZone)
-					.day(.twoDigits)
-					.month(.twoDigits)
-					.hour()
-					.minute(),
-			)
+			return formatted(dayMonth.hour().minute())
 
 		case .iso:
 			let formatter = ISO8601DateFormatter()
@@ -65,7 +57,6 @@ extension Date {
 				.withColonSeparatorInTime,
 				.withFractionalSeconds,
 			]
-			@Dependency(\.timeZone) var timeZone
 			formatter.timeZone = timeZone
 			return formatter.string(from: self)
 		}
