@@ -53,17 +53,20 @@ extension Date {
 			return formatted(Self.dayMonthStyle.hour().minute())
 
 		case .iso:
-			let formatter = ISO8601DateFormatter()
-			formatter.formatOptions = [
-				.withFullDate,
-				.withSpaceBetweenDateAndTime,
-				.withTime,
-				.withColonSeparatorInTime,
-				.withFractionalSeconds,
-			]
+			// Not `Date.ISO8601FormatStyle`: it truncates fractional seconds, where this rounds to
+			// the nearest millisecond.
 			@Dependency(\.timeZone) var timeZone
-			formatter.timeZone = timeZone
-			return formatter.string(from: self)
+			return ISO8601DateFormatter.string(
+				from: self,
+				timeZone: timeZone,
+				formatOptions: [
+					.withColonSeparatorInTime,
+					.withFractionalSeconds,
+					.withFullDate,
+					.withSpaceBetweenDateAndTime,
+					.withTime,
+				],
+			)
 		}
 	}
 }
