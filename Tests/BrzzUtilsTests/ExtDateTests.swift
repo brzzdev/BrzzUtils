@@ -10,6 +10,8 @@ struct ExtDateTests {
 	@Test(arguments: [
 		("en_GB", "16/03"),
 		("en_US", "03/16"),
+		// Persian calendar: 16 March 2026 is 25 Esfand 1404.
+		("fa_IR", "۱۲/۲۵"),
 	])
 	func dayMonthFollowsLocaleOrder(identifier: String, expected: String) {
 		// GIVEN
