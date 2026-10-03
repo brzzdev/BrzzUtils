@@ -54,13 +54,10 @@ struct ExtDateTests {
 
 	@Test(arguments: [
 		(0, "GMT", "1970-01-01 00:00:00.000"),
+		// 16 March 2026, 13:00 UTC.
 		(1_773_666_000, "Asia/Kolkata", "2026-03-16 18:30:00.000"),
-		// The stored `Double` sits just below .123, so truncating would print .122.
-		(1_773_666_000.123, "GMT", "2026-03-16 13:00:00.123"),
-		// Rounds to the nearest millisecond, carrying into the next second.
-		(1_773_666_000.9996, "GMT", "2026-03-16 13:00:01.000"),
 	])
-	func isoMatchesFixedShape(
+	func isoFollowsTimeZone(
 		timeIntervalSince1970: TimeInterval,
 		timeZoneIdentifier: String,
 		expected: String,
@@ -68,6 +65,28 @@ struct ExtDateTests {
 		// GIVEN
 		let date = Date(timeIntervalSince1970: timeIntervalSince1970)
 		let timeZone = try #require(TimeZone(identifier: timeZoneIdentifier))
+
+		// WHEN
+		let formatted = withDependencies {
+			$0.timeZone = timeZone
+		} operation: {
+			date.formatted(style: .iso)
+		}
+
+		// THEN
+		#expect(formatted == expected)
+	}
+
+	@Test(arguments: [
+		// The stored `Double` sits just below .123, so truncating would print .122.
+		(1_773_666_000.123, "2026-03-16 13:00:00.123"),
+		// Carries into the next second.
+		(1_773_666_000.9996, "2026-03-16 13:00:01.000"),
+	])
+	func isoRoundsToNearestMillisecond(timeIntervalSince1970: TimeInterval, expected: String) {
+		// GIVEN
+		let date = Date(timeIntervalSince1970: timeIntervalSince1970)
+		let timeZone = TimeZone.gmt
 
 		// WHEN
 		let formatted = withDependencies {
