@@ -17,7 +17,12 @@ extension Color {
 			(a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
 
 		case 4: // ARGB (16-bit)
-			(a, r, g, b) = ((int >> 12) * 17, (int >> 8 & 0xF) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+			(a, r, g, b) = (
+				(int >> 12) * 17,
+				(int >> 8 & 0xF) * 17,
+				(int >> 4 & 0xF) * 17,
+				(int & 0xF) * 17,
+			)
 
 		case 6: // RGB (24-bit)
 			(a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
