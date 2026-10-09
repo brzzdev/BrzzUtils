@@ -11,12 +11,11 @@ extension ASWebAuthenticationSession {
 		func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
 			#if os(iOS)
 			// A bare `UIWindow()` is deprecated: the anchor has to belong to a scene.
-			// Presenting a session already needs a connected one.
-			let scene = UIApplication.shared
-				.connectedScenes
-				.lazy
-				.compactMap { $0 as? UIWindowScene }
-				.first
+			// Presenting a session already needs a connected one. The foreground scene
+			// comes first, since `connectedScenes` is unordered and a multi-window app
+			// would otherwise anchor to a background one.
+			let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+			let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
 			guard let scene else {
 				preconditionFailure("ASWebAuthenticationSession needs a connected window scene")
 			}
