@@ -118,6 +118,14 @@ test:
         -destination "platform=macOS" \
         | xcbeautify
 
+# Run tests on the pinned iOS simulator; extra arguments go to xcodebuild
+test-ios *args:
+    set -o pipefail && xcodebuild test \
+        -scheme BrzzUtils-Package \
+        -destination "platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0" \
+        {{ args }} \
+        | xcbeautify
+
 # Install developer tools
 tools:
     #!/usr/bin/env bash

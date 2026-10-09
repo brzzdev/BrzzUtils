@@ -61,14 +61,21 @@ extension View {
 	/// Wraps the view in a `UIHostingController` and uses `imageWithLocale`
 	/// so the reference filename is keyed to a fixed locale (default `en_GB`).
 	///
-	/// Appearance and Dynamic Type are applied through the SwiftUI environment and
-	/// are *always* applied, so a snapshot never renders against whatever ambient
-	/// state the shared snapshot window happens to hold. Deliberately there is no
-	/// `traits:` escape hatch: `UITraitCollection(userInterfaceStyle:)` sets
-	/// `overrideUserInterfaceStyle` on that shared window, which outlives the
-	/// assertion and leaks into later suites' references.
+	/// Appearance is applied through the SwiftUI environment. Dynamic Type is
+	/// applied through the environment *and* the `preferredContentSizeCategory`
+	/// trait: SwiftUI content reads the environment, but UIKit chrome inside the
+	/// hierarchy (a `NavigationStack`'s back button) sizes itself from the trait,
+	/// which `config`'s traits otherwise pin to their own category (`.medium` on
+	/// the iPhone presets). Left to disagree, the chrome's size depends on whether
+	/// SwiftUI bridges the environment value across before the capture, and a pushed
+	/// screen's back chevron has been seen to switch size between runs. Both axes
+	/// are always applied, so a snapshot never renders at whatever the device config
+	/// happens to default to.
 	///
-	/// The reference filename encodes the axes — see `snapshotName(testName:…)`.
+	/// Deliberately there is no `traits:` escape hatch. Every rendering axis is a
+	/// named parameter that `snapshotName(testName:scheme:dynamicTypeSize:)`
+	/// encodes into the reference filename, and a free-form trait collection could
+	/// change the render without changing the name.
 	@MainActor
 	public func assertSnapshotWithLocale(
 		on config: ViewImageConfig = .iPhone13,
@@ -86,6 +93,15 @@ extension View {
 		let rootView =
 			environment(\.colorScheme, scheme)
 				.dynamicTypeSize(dynamicTypeSize)
+
+		// Merged into the config rather than set on the hosting controller:
+		// SnapshotTesting applies `config.traits` from a parent container with
+		// `setOverrideTraitCollection(_:forChild:)`, so this replaces the preset's
+		// category for this capture alone instead of competing with it.
+		var config = config
+		config.traits = config.traits.modifyingTraits {
+			$0.preferredContentSizeCategory = UIContentSizeCategory(dynamicTypeSize)
+		}
 
 		assertSnapshot(
 			of: UIHostingController(rootView: rootView),

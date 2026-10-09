@@ -58,8 +58,9 @@ the kind of thing that changes on an untagged branch; the reason to declare thes
 directly is that doing so makes BrzzUtils compile regardless of how any app configures its
 traits, whatever those traits end up being called.
 
-The platform floor stays at iOS 16 / macOS 13, and the resolved dependency graph drops from
-16 pins to 11.
+The platform floor stayed at iOS 16 / macOS 13, and the resolved dependency graph dropped
+from 16 pins to 11. The floor has since moved to the 27 OSes (#90), for reasons unrelated to
+TCA: the package only supports the latest OSes.
 
 **Do not add `swift-composable-architecture` (or TCA26) back.** Re-adding it looks like a
 simplification — one dependency instead of three, and it re-exports everything — but it
