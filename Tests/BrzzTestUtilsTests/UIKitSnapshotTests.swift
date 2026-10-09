@@ -57,7 +57,9 @@ struct UIKitSnapshotTests {
 	/// showed up as a chevron that changed size in some runs and not others.
 	///
 	/// Dark, because the chevron is drawn for a glass platter that the layer render
-	/// leaves out: on a light bar it is all but invisible.
+	/// leaves out: on a light bar it is all but invisible. The relaxed perceptual
+	/// precision absorbs anti-aliasing noise between machines; with `precision` at 1,
+	/// a white chevron changing size on black still fails.
 	@Test(arguments: 1 ... 12)
 	func pushedBackButton(run _: Int) {
 		NavigationStack(path: .constant([1])) {
