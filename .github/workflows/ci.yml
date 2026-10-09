@@ -16,7 +16,7 @@ concurrency:
 jobs:
   test:
     name: Test ${{ matrix.platform }}
-    runs-on: macos-26
+    runs-on: xcode-27
     strategy:
       # Let each platform leg finish independently: a macOS failure should not
       # cancel the still-running iOS leg (or vice versa), so a red run reports
@@ -26,7 +26,7 @@ jobs:
         platform: [iOS, macOS]
         include:
           - platform: iOS
-            destination: "platform=iOS Simulator,name=iPhone 17 Pro,OS=latest"
+            destination: "platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0"
           - platform: macOS
             destination: "platform=macOS"
 
@@ -37,9 +37,9 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: latest-stable
+          xcode-version: "27.0"
 
-      # Key the cache to the resolved Xcode build so a `latest-stable` bump can
+      # Key the cache to the resolved Xcode build so an Xcode bump can
       # never restore DerivedData whose SwiftSyntax macro binaries were compiled
       # against the previous toolchain (they fail with "unable to resolve Swift
       # module dependency to a compatible module"). Runs after Setup Xcode so the

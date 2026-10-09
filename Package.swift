@@ -1,4 +1,4 @@
-// swift-tools-version: 6.3
+// swift-tools-version: 6.4
 
 import PackageDescription
 
@@ -40,10 +40,10 @@ private let Tagged = Target.Dependency.product(
 let package = Package(
 	name: "BrzzUtils",
 	platforms: [
-		.iOS(.v16),
-		.macOS(.v13),
-		.tvOS(.v17),
-		.watchOS(.v10),
+		.iOS(.v27),
+		.macOS(.v27),
+		.tvOS(.v27),
+		.watchOS(.v27),
 	],
 	products: [
 		.library(
