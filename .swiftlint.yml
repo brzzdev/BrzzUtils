@@ -9,10 +9,10 @@ parent_config: https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/sw
 # Inlined, there is no second file to lose.
 
 deployment_target:
-  iOS_deployment_target: 16.0
-  macOS_deployment_target: 13.0
-  tvOS_deployment_target: 17.0
-  watchOS_deployment_target: 10.0
+  iOS_deployment_target: 27.0
+  macOS_deployment_target: 27.0
+  tvOS_deployment_target: 27.0
+  watchOS_deployment_target: 27.0
 
 excluded:
   - .build
