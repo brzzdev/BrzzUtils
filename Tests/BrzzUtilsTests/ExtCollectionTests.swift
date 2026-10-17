@@ -3,7 +3,7 @@ import Testing
 
 struct ExtCollectionTests {
 	@Test
-	func isNotEmpty() {
+	func `is not empty`() {
 		// GIVEN
 		let nonEmptyArray = [1, 2, 3]
 		let emptyArray = [Int]()
@@ -18,7 +18,7 @@ struct ExtCollectionTests {
 	}
 
 	@Test
-	func safeSubscription() {
+	func `safe subscription`() {
 		// GIVEN
 		let array = [1, 2, 3]
 
@@ -32,7 +32,7 @@ struct ExtCollectionTests {
 	}
 
 	@Test
-	func mutableCollectionSafeSubscription() {
+	func `mutable collection safe subscription`() {
 		// GIVEN
 		var array = [1, 2, 3]
 

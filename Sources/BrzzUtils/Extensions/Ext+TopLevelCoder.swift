@@ -8,7 +8,7 @@ extension TopLevelDecoder where Input == Data {
 }
 
 extension TopLevelEncoder where Output == Data {
-	public func safeEncode(_ value: (some Encodable)?) -> Output? {
+	public func safeEncode(_ value: some Encodable?) -> Output? {
 		guard let value else { return nil }
 		return try? encode(value)
 	}
