@@ -64,25 +64,12 @@ fetch-swiftformat-config:
 
 # Format Swift sources
 format: fetch-swiftformat-config
-    mint run swiftformat . --base-config {{ swiftformat_base }}
+    swiftformat . --base-config {{ swiftformat_base }}
 
 [private]
 format-staged: fetch-swiftformat-config
-    #!/usr/bin/env bash
-    # `mint which` writes the path to stdout and its failures to stderr, so piping
-    # it into `tail` without pipefail swallows a 127 and yields an empty string. The
-    # formatter command would then start with a bare ` stdin`, and the pre-commit
-    # hook would pass while formatting nothing at all. The assignment sits in the
-    # `if` condition so `set -e` does not abort on it before the message is printed.
-    set -euo pipefail
-
-    if ! formatter="$(mint which swiftformat | tail -1)" || [ -z "$formatter" ]; then
-        echo "swiftformat not installed — run \`just tools\`." >&2
-        exit 1
-    fi
-
     git-format-staged \
-        --formatter "$formatter stdin --stdinpath '{}' --base-config {{ swiftformat_base }}" \
+        --formatter "swiftformat stdin --stdinpath '{}' --base-config {{ swiftformat_base }}" \
         "*.swift"
 
 # Fail on a SwiftLint violation, or on the shared config going missing
@@ -104,7 +91,7 @@ lint:
     swiftlint --strict --config .swiftlint.yml
 # Show outdated Swift packages
 outdated:
-    mint run swift-outdated
+    swift-outdated
 
 # Place pre-commit hook locally
 pre-commit:
@@ -128,33 +115,5 @@ test-ios *args:
 
 # Install developer tools
 tools:
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    # The installer is fetched into a variable first so a failed download stops
-    # here, rather than running the empty string, reporting success and leaving
-    # `brew: command not found` two lines later to explain itself. It also cannot
-    # put brew on the PATH of the shell that invoked it, and on Apple Silicon brew
-    # lands in /opt/homebrew, which is on no default PATH — hence `shellenv`.
-    # `shellenv bash` rather than a bare one, which emits zsh array syntax.
-    if ! command -v brew >/dev/null; then
-        installer="$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        /bin/bash -c "$installer"
-        for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew; do
-            [ -x "$brew_bin" ] || continue
-            eval "$("$brew_bin" shellenv bash)"
-            break
-        done
-    fi
-
-    if ! command -v brew >/dev/null; then
-        echo 'Homebrew is installed but not on PATH. Add `eval "$(brew shellenv)"` to your shell profile, then re-run.' >&2
-        exit 1
-    fi
-
-    # No `brew tap Homebrew/bundle`: bundle is part of brew itself now, the tap is
-    # empty, and tapping it exits 1 — which aborted this recipe before it ever
-    # reached the Brewfile.
-    brew bundle install
-    mint bootstrap
+    mise install
     just pre-commit
