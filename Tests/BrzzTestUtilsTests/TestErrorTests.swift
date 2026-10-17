@@ -4,63 +4,63 @@ import Testing
 
 struct TestErrorTests {
 	@Test
-	func networkErrorDescription() {
+	func `network error description`() {
 		let error = TestError.networkError
 		#expect(error.description == "TestError(1000: Network connection failed)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func timeoutErrorDescription() {
+	func `timeout error description`() {
 		let error = TestError.timeoutError
 		#expect(error.description == "TestError(1001: Operation timed out)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func serverErrorDescription() {
+	func `server error description`() {
 		let error = TestError.serverError
 		#expect(error.description == "TestError(5000: Server error)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func authErrorDescription() {
+	func `auth error description`() {
 		let error = TestError.authError
 		#expect(error.description == "TestError(4010: Authentication failed)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func notFoundErrorDescription() {
+	func `not found error description`() {
 		let error = TestError.notFoundError
 		#expect(error.description == "TestError(4040: Resource not found)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func customErrorWithMessage() {
+	func `custom error with message`() {
 		let error = TestError.custom(code: 42, message: "Custom failure")
 		#expect(error.description == "TestError(42: Custom failure)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func customErrorWithEmptyMessage() {
+	func `custom error with empty message`() {
 		let error = TestError.custom(code: 42, message: "")
 		#expect(error.description == "TestError(42)")
 		#expect(error.localizedDescription == error.description)
 	}
 
 	@Test
-	func genericError() {
+	func `generic error`() {
 		let error = TestError.genericError
 		let expectedError = TestError.custom(code: 0, message: "An unknown error occurred")
 		#expect(error == expectedError)
 	}
 
 	@Test
-	func randomError() {
+	func `random error`() {
 		let error = TestError.random()
 		switch error {
 		case let .custom(code, message):

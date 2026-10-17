@@ -42,7 +42,7 @@ struct UIKitSnapshotTests {
 	}
 
 	@Test
-	func contentSizeCategoryTrait() {
+	func `content size category trait`() {
 		let probe = TraitProbe()
 		TraitProbeView(probe: probe)
 			.background(Color(white: 0.5))
@@ -61,7 +61,7 @@ struct UIKitSnapshotTests {
 	/// precision absorbs anti-aliasing noise between machines; with `precision` at 1,
 	/// a white chevron changing size on black still fails.
 	@Test(arguments: 1 ... 12)
-	func pushedBackButton(run _: Int) {
+	func `pushed back button`(run _: Int) {
 		NavigationStack(path: .constant([1])) {
 			Color(white: 0.5)
 				.navigationDestination(for: Int.self) { _ in

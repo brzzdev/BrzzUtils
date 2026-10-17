@@ -1,0 +1,7 @@
+[tools]
+just = "latest"
+"npm:git-format-staged" = "latest"
+"spm:kiliankoe/swift-outdated" = "latest"
+swiftformat = "latest"
+swiftlint = "latest"
+xcbeautify = "latest"

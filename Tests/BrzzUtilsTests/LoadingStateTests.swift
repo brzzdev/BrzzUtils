@@ -3,7 +3,7 @@ import Testing
 
 struct LoadingStateTests {
 	@Test
-	func isLoadingIsTrueOnlyWhileFetching() {
+	func `is loading is true only while fetching`() {
 		#expect(LoadingState.loadingWithoutContent.isLoading)
 		#expect(LoadingState.refreshing.isLoading)
 		#expect(!LoadingState.loaded.isLoading)
@@ -11,7 +11,7 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func setLoadingTrueRefreshesOnlyWhenThereIsContentToKeep() {
+	func `set loading true refreshes only when there is content to keep`() {
 		// GIVEN
 		var loadingWithoutContent = LoadingState.loadingWithoutContent
 		var loaded = LoadingState.loaded
@@ -33,7 +33,7 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func setLoadingFalseMarksLoaded() {
+	func `set loading false marks loaded`() {
 		// GIVEN
 		var refreshing = LoadingState.refreshing
 		var failed = LoadingState.failed(message: "boom")
@@ -48,7 +48,7 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func failStoresTheMessageFromAnyState() {
+	func `fail stores the message from any state`() {
 		// GIVEN
 		var loadingWithoutContent = LoadingState.loadingWithoutContent
 		var loaded = LoadingState.loaded
@@ -63,7 +63,7 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func failIfEmptyOnlyTakesOverTheScreenWhenThereIsNothingToShow() {
+	func `fail if empty only takes over the screen when there is nothing to show`() {
 		// GIVEN
 		var withoutContent = LoadingState.loadingWithoutContent
 		var withContent = LoadingState.refreshing
@@ -78,7 +78,7 @@ struct LoadingStateTests {
 	}
 
 	@Test
-	func failIfEmptyOverContentKeepsTheNextReloadInline() {
+	func `fail if empty over content keeps the next reload inline`() {
 		// GIVEN
 		var state = LoadingState.refreshing
 

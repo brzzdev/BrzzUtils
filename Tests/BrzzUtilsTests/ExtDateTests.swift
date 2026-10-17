@@ -13,7 +13,7 @@ struct ExtDateTests {
 		// Persian calendar: 16 March 2026 is 25 Esfand 1404.
 		("fa_IR", "۱۲/۲۵"),
 	])
-	func dayMonthFollowsLocaleOrder(identifier: String, expected: String) {
+	func `day month follows locale order`(identifier: String, expected: String) {
 		// GIVEN
 		let locale = Locale(identifier: identifier)
 		let timeZone = TimeZone.gmt
@@ -35,7 +35,7 @@ struct ExtDateTests {
 		// ICU separates the day period with a narrow no-break space.
 		("en_US", "03/16, 1:00\u{202F}PM"),
 	])
-	func dayMonthTimeFollowsLocaleHourCycle(identifier: String, expected: String) {
+	func `day month time follows locale hour cycle`(identifier: String, expected: String) {
 		// GIVEN
 		let locale = Locale(identifier: identifier)
 		let timeZone = TimeZone.gmt
@@ -57,7 +57,7 @@ struct ExtDateTests {
 		// 16 March 2026, 13:00 UTC.
 		(1_773_666_000, "Asia/Kolkata", "2026-03-16 18:30:00.000"),
 	])
-	func isoFollowsTimeZone(
+	func `iso follows time zone`(
 		timeIntervalSince1970: TimeInterval,
 		timeZoneIdentifier: String,
 		expected: String,
@@ -83,7 +83,7 @@ struct ExtDateTests {
 		// Carries into the next second.
 		(1_773_666_000.9996, "2026-03-16 13:00:01.000"),
 	])
-	func isoRoundsToNearestMillisecond(timeIntervalSince1970: TimeInterval, expected: String) {
+	func `iso rounds to nearest millisecond`(timeIntervalSince1970: TimeInterval, expected: String) {
 		// GIVEN
 		let date = Date(timeIntervalSince1970: timeIntervalSince1970)
 		let timeZone = TimeZone.gmt

@@ -4,7 +4,7 @@ import Testing
 
 struct CancelBagTests {
 	@Test
-	func cancelAll() {
+	func `cancel all`() {
 		let cancelBag = CancelBag()
 
 		var isCancelled1 = false
@@ -33,7 +33,7 @@ struct CancelBagTests {
 	}
 
 	@Test
-	func cancellablesBuilder() {
+	func `cancellables builder`() {
 		let cancelBag = CancelBag()
 
 		var isCancelled1 = false

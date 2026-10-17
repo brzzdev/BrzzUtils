@@ -55,6 +55,7 @@ extension Snapshotting where Value == UIViewController, Format == UIImage {
 	}
 }
 
+@MainActor
 extension View {
 	/// Asserts a snapshot of this view using a locale-aware strategy.
 	///
@@ -76,7 +77,6 @@ extension View {
 	/// named parameter that `snapshotName(testName:scheme:dynamicTypeSize:)`
 	/// encodes into the reference filename, and a free-form trait collection could
 	/// change the render without changing the name.
-	@MainActor
 	public func assertSnapshotWithLocale(
 		on config: ViewImageConfig = .iPhone13,
 		dynamicTypeSize: DynamicTypeSize = .large,
@@ -175,6 +175,7 @@ private func fixedScaleImage(of view: NSView, scale: CGFloat) -> NSImage {
 	return image
 }
 
+@MainActor
 extension View {
 	/// Asserts a snapshot of this view using a locale-aware strategy.
 	///
@@ -185,7 +186,6 @@ extension View {
 	/// Appearance and Dynamic Type are applied through the SwiftUI environment and
 	/// are always applied, matching the UIKit overload so both platforms key their
 	/// references the same way.
-	@MainActor
 	public func assertSnapshotWithLocale(
 		dynamicTypeSize: DynamicTypeSize = .large,
 		locale: Locale = Locale(identifier: "en_GB"),
