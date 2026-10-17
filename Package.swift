@@ -58,7 +58,7 @@ let package = Package(
 	dependencies: [
 		.package(
 			url: "https://github.com/pointfreeco/swift-concurrency-extras",
-			from: "1.4.1",
+			from: "1.4.2",
 		),
 		.package(
 			url: "https://github.com/pointfreeco/swift-dependencies",
