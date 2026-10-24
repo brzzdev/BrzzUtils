@@ -2,7 +2,7 @@
 # shares: two checkouts on different config revisions otherwise fight over one
 # file, and each overwrites the other's config mid-commit.
 swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
-swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Configs/swiftformat"
+swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
 
 # Build the package
 build:
