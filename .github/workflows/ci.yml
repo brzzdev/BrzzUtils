@@ -58,7 +58,7 @@ jobs:
       # main's cache, and each merge then re-saved the same key anyway.
       - name: Restore Xcode cache
         id: cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
@@ -68,7 +68,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-
 
       - name: Install tools
-        uses: jdx/mise-action@v5
+        uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5
 
       - name: Verify Macros
         run: defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
@@ -106,7 +106,7 @@ jobs:
       # actions/cache/save has no restore step to skip itself.
       - name: Save Xcode cache
         if: github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
