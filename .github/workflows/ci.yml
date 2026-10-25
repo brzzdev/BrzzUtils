@@ -68,7 +68,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.platform }}-xcode-${{ env.XCODE_BUILD }}-
 
       - name: Install tools
-        uses: jdx/mise-action@v5
+        uses: jdx/mise-action@8418fedb1110381a0d3ba51a7a415d7c1b884550 # v5.2.2
 
       - name: Verify Macros
         run: defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
