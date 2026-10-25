@@ -58,7 +58,7 @@ jobs:
       # main's cache, and each merge then re-saved the same key anyway.
       - name: Restore Xcode cache
         id: cache
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
@@ -106,7 +106,7 @@ jobs:
       # actions/cache/save has no restore step to skip itself.
       - name: Save Xcode cache
         if: github.ref == 'refs/heads/main' && steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: |
             ~/Library/Developer/Xcode/DerivedData
