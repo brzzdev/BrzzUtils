@@ -4,6 +4,10 @@
 swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
 swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
 
+# List available recipes
+default:
+    @just --list
+
 # Build the package
 build:
     set -o pipefail && xcodebuild build \
