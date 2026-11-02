@@ -1,3 +1,5 @@
+set default-list
+
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
 # shares: two checkouts on different config revisions otherwise fight over one
 # file, and each overwrites the other's config mid-commit.

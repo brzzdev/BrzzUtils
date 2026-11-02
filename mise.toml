@@ -1,5 +1,5 @@
 [tools]
-just = "latest"
+just = "1.59.0"
 "npm:git-format-staged" = "latest"
 "spm:kiliankoe/swift-outdated" = "latest"
 swiftformat = "latest"
