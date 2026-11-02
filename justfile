@@ -1,12 +1,10 @@
+set default-list
+
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
 # shares: two checkouts on different config revisions otherwise fight over one
 # file, and each overwrites the other's config mid-commit.
 swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
 swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
-
-# List available recipes
-default:
-    @just --list
 
 # Build the package
 build:
