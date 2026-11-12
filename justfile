@@ -26,7 +26,7 @@ build-ios: (build-for "generic/platform=iOS")
 
 # Build the package in Release for macOS, printing where its object files land
 build-release: (build-for "platform=macOS" "-configuration" "Release" "-derivedDataPath" release_derived_data)
-    @echo {{ justfile_directory() / release_derived_data }}/Build/Products/Release
+    @echo {{ quote(justfile_directory() / release_derived_data / "Build/Products/Release") }}
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
