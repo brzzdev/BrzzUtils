@@ -1,5 +1,9 @@
 set default-list
 
+# Xcode's default DerivedData path is hashed, so its object files have no stable location.
+release_derived_data := ".build/release"
+scheme := "BrzzUtils-Package"
+
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
 # shares: two checkouts on different config revisions otherwise fight over one
 # file, and each overwrites the other's config mid-commit.
@@ -7,11 +11,22 @@ swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
 swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
 
 # Build the package
-build:
+build: (build-for "platform=macOS")
+
+[private]
+build-for destination *args:
     set -o pipefail && xcodebuild build \
-        -scheme BrzzUtils-Package \
-        -destination "platform=macOS" \
+        -scheme {{ scheme }} \
+        -destination {{ quote(destination) }} \
+        {{ args }} \
         | xcbeautify
+
+# Build the package for a generic iOS device, no simulator needed
+build-ios: (build-for "generic/platform=iOS")
+
+# Build the package in Release for macOS, printing where its object files land
+build-release: (build-for "platform=macOS" "-configuration" "Release" "-derivedDataPath" release_derived_data)
+    @echo {{ quote(justfile_directory() / release_derived_data / "Build/Products/Release") }}
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
@@ -103,14 +118,14 @@ pre-commit:
 # Run tests
 test:
     set -o pipefail && xcodebuild test \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "platform=macOS" \
         | xcbeautify
 
 # Run tests on the pinned iOS simulator; extra arguments go to xcodebuild
 test-ios *args:
     set -o pipefail && xcodebuild test \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0" \
         {{ args }} \
         | xcbeautify
