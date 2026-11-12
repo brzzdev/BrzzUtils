@@ -10,23 +10,22 @@ scheme := "BrzzUtils-Package"
 swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
 swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
 
-# Build the package; extra arguments go to xcodebuild
-build *args:
+# Build the package
+build: (build-for "platform=macOS")
+
+[private]
+build-for destination *args:
     set -o pipefail && xcodebuild build \
         -scheme {{ scheme }} \
-        -destination "platform=macOS" \
+        -destination {{ quote(destination) }} \
         {{ args }} \
         | xcbeautify
 
 # Build the package for a generic iOS device, no simulator needed
-build-ios:
-    set -o pipefail && xcodebuild build \
-        -scheme {{ scheme }} \
-        -destination "generic/platform=iOS" \
-        | xcbeautify
+build-ios: (build-for "generic/platform=iOS")
 
 # Build the package in Release for macOS, printing where its object files land
-build-release: (build "-configuration" "Release" "-derivedDataPath" release_derived_data)
+build-release: (build-for "platform=macOS" "-configuration" "Release" "-derivedDataPath" release_derived_data)
     @echo {{ justfile_directory() / release_derived_data }}/Build/Products/Release
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
