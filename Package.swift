@@ -106,6 +106,7 @@ let package = Package(
 				IssueReporting,
 				Tagged,
 			],
+			resources: [.copy("PrivacyInfo.xcprivacy")],
 		),
 		.testTarget(
 			name: "BrzzUtilsTests",
