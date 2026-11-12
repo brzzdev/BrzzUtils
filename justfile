@@ -1,7 +1,8 @@
 set default-list
 
-# Fixed, unlike Xcode's hashed default, so the Release object files have a stable path.
+# Xcode's default DerivedData path is hashed, so its object files have no stable location.
 release_derived_data := ".build/release"
+scheme := "BrzzUtils-Package"
 
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
 # shares: two checkouts on different config revisions otherwise fight over one
@@ -9,29 +10,24 @@ release_derived_data := ".build/release"
 swiftformat_base := "/tmp/swiftformat-base-BrzzUtils"
 swiftformat_url := "https://raw.githubusercontent.com/brzzdev/Configs/main/Swift/swiftformat"
 
-# Build the package
-build:
+# Build the package; extra arguments go to xcodebuild
+build *args:
     set -o pipefail && xcodebuild build \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "platform=macOS" \
+        {{ args }} \
         | xcbeautify
 
 # Build the package for a generic iOS device, no simulator needed
 build-ios:
     set -o pipefail && xcodebuild build \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "generic/platform=iOS" \
         | xcbeautify
 
 # Build the package in Release for macOS, printing where its object files land
-build-release:
-    set -o pipefail && xcodebuild build \
-        -scheme BrzzUtils-Package \
-        -configuration Release \
-        -derivedDataPath {{ release_derived_data }} \
-        -destination "platform=macOS" \
-        | xcbeautify
-    @echo "Object files: {{ release_derived_data }}/Build/Products/Release"
+build-release: (build "-configuration" "Release" "-derivedDataPath" release_derived_data)
+    @echo {{ justfile_directory() / release_derived_data }}/Build/Products/Release
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
@@ -123,14 +119,14 @@ pre-commit:
 # Run tests
 test:
     set -o pipefail && xcodebuild test \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "platform=macOS" \
         | xcbeautify
 
 # Run tests on the pinned iOS simulator; extra arguments go to xcodebuild
 test-ios *args:
     set -o pipefail && xcodebuild test \
-        -scheme BrzzUtils-Package \
+        -scheme {{ scheme }} \
         -destination "platform=iOS Simulator,name=iPhone 18 Pro,OS=27.0" \
         {{ args }} \
         | xcbeautify
