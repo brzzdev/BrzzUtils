@@ -1,5 +1,8 @@
 set default-list
 
+# Fixed, unlike Xcode's hashed default, so the Release object files have a stable path.
+release_derived_data := ".build/release"
+
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
 # shares: two checkouts on different config revisions otherwise fight over one
 # file, and each overwrites the other's config mid-commit.
@@ -12,6 +15,23 @@ build:
         -scheme BrzzUtils-Package \
         -destination "platform=macOS" \
         | xcbeautify
+
+# Build the package for a generic iOS device, no simulator needed
+build-ios:
+    set -o pipefail && xcodebuild build \
+        -scheme BrzzUtils-Package \
+        -destination "generic/platform=iOS" \
+        | xcbeautify
+
+# Build the package in Release for macOS, printing where its object files land
+build-release:
+    set -o pipefail && xcodebuild build \
+        -scheme BrzzUtils-Package \
+        -configuration Release \
+        -derivedDataPath {{ release_derived_data }} \
+        -destination "platform=macOS" \
+        | xcbeautify
+    @echo "Object files: {{ release_derived_data }}/Build/Products/Release"
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
