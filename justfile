@@ -121,9 +121,11 @@ privacy-audit: build-release
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Apple's required-reason APIs as `nm -u` names them; Swift's wrappers reference these
-    # same symbols, so none needs its mangled name. getattrlist, fgetattrlist, and
-    # getattrlistat read timestamps and disk space alike, so they count towards both.
+    # Apple's required-reason APIs as `nm -u` names them, copied from
+    # https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api.
+    # Swift's wrappers reference these same symbols, so none needs its mangled name.
+    # getattrlist, fgetattrlist, and getattrlistat read timestamps and disk space alike, so
+    # they count towards both.
     required_reason_symbols='
     NSPrivacyAccessedAPICategoryActiveKeyboards _objc_msgSend$activeInputModes
     NSPrivacyAccessedAPICategoryDiskSpace _NSFileSystemFreeSize
@@ -163,10 +165,16 @@ privacy-audit: build-release
             | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$required_reason_symbols")
     )"
     referenced_categories="$(awk '{ print $1 }' <<<"$referenced_apis" | sort -u)"
+
+    manifest=Sources/BrzzUtils/PrivacyInfo.xcprivacy
+    plutil -lint -s "$manifest"
     declared_categories="$(
-        plutil -p Sources/BrzzUtils/PrivacyInfo.xcprivacy \
-            | sed -n 's|.*"NSPrivacyAccessedAPIType" => "\(.*\)"|\1|p' \
-            | sort -u
+        if [ "$(plutil -type NSPrivacyAccessedAPITypes "$manifest" 2>/dev/null)" = array ]; then
+            count="$(plutil -extract NSPrivacyAccessedAPITypes raw -o - "$manifest")"
+            for ((i = 0; i < count; i++)); do
+                plutil -extract "NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType" raw -o - "$manifest"
+            done
+        fi | sort -u
     )"
 
     undeclared="$(comm -23 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
