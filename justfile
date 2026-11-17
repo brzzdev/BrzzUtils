@@ -166,12 +166,21 @@ privacy-audit: build-release
     )"
     referenced_categories="$(awk '{ print $1 }' <<<"$referenced_rows" | sort -u)"
 
+    category_pattern='^NSPrivacyAccessedAPICategory[A-Za-z]+$'
     manifest=Sources/BrzzUtils/PrivacyInfo.xcprivacy
     count="$(plutil -extract NSPrivacyAccessedAPITypes raw -expect array -o - "$manifest")"
     # `set -e` doesn't reach inside the substitution, so a failed entry exits it explicitly.
     declared_categories="$(
         for ((i = 0; i < count; i++)); do
-            plutil -extract "NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType" raw -expect string -o - "$manifest" || exit
+            key_path="NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType"
+            # The trailing x stops `$(…)` stripping newlines that belong to the value itself.
+            category="$(plutil -extract "$key_path" raw -expect string -o - "$manifest" && echo x)" || exit
+            category="${category%$'\n'x}"
+            if [[ ! $category =~ $category_pattern ]]; then
+                echo "malformed: $key_path is '$category'" >&2
+                exit 1
+            fi
+            echo "$category"
         done | sort -u
     )"
 
