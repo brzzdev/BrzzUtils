@@ -122,50 +122,50 @@ privacy-audit: build-release
     set -euo pipefail
 
     # Apple's required-reason APIs as `nm -u` names them; Swift's wrappers reference these
-    # same symbols, so none needs its mangled name. The getattrlist family reads
-    # timestamps and disk space alike, so it counts towards both categories.
-    apis='
-    ActiveKeyboards _objc_msgSend$activeInputModes
-    DiskSpace _NSFileSystemFreeSize
-    DiskSpace _NSFileSystemSize
-    DiskSpace _NSURLVolumeAvailableCapacityForImportantUsageKey
-    DiskSpace _NSURLVolumeAvailableCapacityForOpportunisticUsageKey
-    DiskSpace _NSURLVolumeAvailableCapacityKey
-    DiskSpace _NSURLVolumeTotalCapacityKey
-    DiskSpace _fgetattrlist
-    DiskSpace _fstatfs
-    DiskSpace _fstatvfs
-    DiskSpace _getattrlist
-    DiskSpace _getattrlistat
-    DiskSpace _statfs
-    DiskSpace _statvfs
-    FileTimestamp _NSFileCreationDate
-    FileTimestamp _NSFileModificationDate
-    FileTimestamp _NSURLContentModificationDateKey
-    FileTimestamp _NSURLCreationDateKey
-    FileTimestamp _fgetattrlist
-    FileTimestamp _fstat
-    FileTimestamp _fstatat
-    FileTimestamp _getattrlist
-    FileTimestamp _getattrlistat
-    FileTimestamp _getattrlistbulk
-    FileTimestamp _lstat
-    FileTimestamp _objc_msgSend$fileModificationDate
-    FileTimestamp _stat
-    SystemBootTime _mach_absolute_time
-    SystemBootTime _objc_msgSend$systemUptime
-    UserDefaults _OBJC_CLASS_$_NSUserDefaults
+    # same symbols, so none needs its mangled name. getattrlist, fgetattrlist, and
+    # getattrlistat read timestamps and disk space alike, so they count towards both.
+    required_reason_symbols='
+    NSPrivacyAccessedAPICategoryActiveKeyboards _objc_msgSend$activeInputModes
+    NSPrivacyAccessedAPICategoryDiskSpace _NSFileSystemFreeSize
+    NSPrivacyAccessedAPICategoryDiskSpace _NSFileSystemSize
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityForImportantUsageKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityForOpportunisticUsageKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeTotalCapacityKey
+    NSPrivacyAccessedAPICategoryDiskSpace _fgetattrlist
+    NSPrivacyAccessedAPICategoryDiskSpace _fstatfs
+    NSPrivacyAccessedAPICategoryDiskSpace _fstatvfs
+    NSPrivacyAccessedAPICategoryDiskSpace _getattrlist
+    NSPrivacyAccessedAPICategoryDiskSpace _getattrlistat
+    NSPrivacyAccessedAPICategoryDiskSpace _statfs
+    NSPrivacyAccessedAPICategoryDiskSpace _statvfs
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSFileCreationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSFileModificationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSURLContentModificationDateKey
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSURLCreationDateKey
+    NSPrivacyAccessedAPICategoryFileTimestamp _fgetattrlist
+    NSPrivacyAccessedAPICategoryFileTimestamp _fstat
+    NSPrivacyAccessedAPICategoryFileTimestamp _fstatat
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlist
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlistat
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlistbulk
+    NSPrivacyAccessedAPICategoryFileTimestamp _lstat
+    NSPrivacyAccessedAPICategoryFileTimestamp _objc_msgSend$fileModificationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _stat
+    NSPrivacyAccessedAPICategorySystemBootTime _mach_absolute_time
+    NSPrivacyAccessedAPICategorySystemBootTime _objc_msgSend$systemUptime
+    NSPrivacyAccessedAPICategoryUserDefaults _OBJC_CLASS_$_NSUserDefaults
     '
 
-    # The rows of the table above whose symbol `nm -u` lists.
+    # awk reads the `nm -u` symbols first, then keeps each table row whose symbol is among them.
     referenced_apis="$(
         nm -u {{ quote(release_products / "BrzzUtils.o") }} \
-            | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$apis")
+            | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$required_reason_symbols")
     )"
     referenced_categories="$(awk '{ print $1 }' <<<"$referenced_apis" | sort -u)"
     declared_categories="$(
         plutil -p Sources/BrzzUtils/PrivacyInfo.xcprivacy \
-            | sed -n 's|.*"NSPrivacyAccessedAPIType" => "NSPrivacyAccessedAPICategory\(.*\)"|\1|p' \
+            | sed -n 's|.*"NSPrivacyAccessedAPIType" => "\(.*\)"|\1|p' \
             | sort -u
     )"
 
