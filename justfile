@@ -2,6 +2,7 @@ set default-list
 
 # Xcode's default DerivedData path is hashed, so its object files have no stable location.
 release_derived_data := ".build/release"
+release_products := justfile_directory() / release_derived_data / "Build/Products/Release"
 scheme := "BrzzUtils-Package"
 
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
@@ -26,7 +27,7 @@ build-ios: (build-for "generic/platform=iOS")
 
 # Build the package in Release for macOS, printing where its object files land
 build-release: (build-for "platform=macOS" "-configuration" "Release" "-derivedDataPath" release_derived_data)
-    @echo {{ quote(justfile_directory() / release_derived_data / "Build/Products/Release") }}
+    @echo {{ quote(release_products) }}
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
@@ -114,6 +115,85 @@ outdated:
 pre-commit:
     cp .scripts/pre-commit .git/hooks/pre-commit
     chmod +x .git/hooks/pre-commit
+
+# Fail when BrzzUtils' required-reason API categories differ from its privacy manifest's
+privacy-audit: build-release
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Apple's required-reason APIs as `nm -u` names them, copied from
+    # https://developer.apple.com/documentation/bundleresources/describing-use-of-required-reason-api.
+    # Swift's wrappers reference these same symbols, so none needs its mangled name.
+    # getattrlist, fgetattrlist, and getattrlistat read timestamps and disk space alike, so
+    # they count towards both.
+    required_reason_symbols='
+    NSPrivacyAccessedAPICategoryActiveKeyboards _objc_msgSend$activeInputModes
+    NSPrivacyAccessedAPICategoryDiskSpace _NSFileSystemFreeSize
+    NSPrivacyAccessedAPICategoryDiskSpace _NSFileSystemSize
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityForImportantUsageKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityForOpportunisticUsageKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeAvailableCapacityKey
+    NSPrivacyAccessedAPICategoryDiskSpace _NSURLVolumeTotalCapacityKey
+    NSPrivacyAccessedAPICategoryDiskSpace _fgetattrlist
+    NSPrivacyAccessedAPICategoryDiskSpace _fstatfs
+    NSPrivacyAccessedAPICategoryDiskSpace _fstatvfs
+    NSPrivacyAccessedAPICategoryDiskSpace _getattrlist
+    NSPrivacyAccessedAPICategoryDiskSpace _getattrlistat
+    NSPrivacyAccessedAPICategoryDiskSpace _statfs
+    NSPrivacyAccessedAPICategoryDiskSpace _statvfs
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSFileCreationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSFileModificationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSURLContentModificationDateKey
+    NSPrivacyAccessedAPICategoryFileTimestamp _NSURLCreationDateKey
+    NSPrivacyAccessedAPICategoryFileTimestamp _fgetattrlist
+    NSPrivacyAccessedAPICategoryFileTimestamp _fstat
+    NSPrivacyAccessedAPICategoryFileTimestamp _fstatat
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlist
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlistat
+    NSPrivacyAccessedAPICategoryFileTimestamp _getattrlistbulk
+    NSPrivacyAccessedAPICategoryFileTimestamp _lstat
+    NSPrivacyAccessedAPICategoryFileTimestamp _objc_msgSend$fileModificationDate
+    NSPrivacyAccessedAPICategoryFileTimestamp _stat
+    NSPrivacyAccessedAPICategorySystemBootTime _mach_absolute_time
+    NSPrivacyAccessedAPICategorySystemBootTime _objc_msgSend$systemUptime
+    NSPrivacyAccessedAPICategoryUserDefaults _OBJC_CLASS_$_NSUserDefaults
+    '
+
+    # awk reads the `nm -u` symbols first, then keeps each table row whose symbol is among them.
+    referenced_rows="$(
+        nm -u {{ quote(release_products / "BrzzUtils.o") }} \
+            | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$required_reason_symbols")
+    )"
+    referenced_categories="$(awk '{ print $1 }' <<<"$referenced_rows" | sort -u)"
+
+    category_pattern='^NSPrivacyAccessedAPICategory[A-Za-z]+$'
+    manifest=Sources/BrzzUtils/PrivacyInfo.xcprivacy
+    count="$(plutil -extract NSPrivacyAccessedAPITypes raw -expect array -o - "$manifest")"
+    # `set -e` doesn't reach inside the substitution, so a failed entry exits it explicitly.
+    declared_categories="$(
+        for ((i = 0; i < count; i++)); do
+            key_path="NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType"
+            # The trailing x stops `$(…)` stripping newlines that belong to the value itself.
+            category="$(plutil -extract "$key_path" raw -expect string -o - "$manifest" && echo x)" || exit
+            category="${category%$'\n'x}"
+            if [[ ! $category =~ $category_pattern ]]; then
+                echo "malformed: $key_path is '$category'" >&2
+                exit 1
+            fi
+            echo "$category"
+        done | sort -u
+    )"
+
+    undeclared="$(comm -23 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
+    stale="$(comm -13 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
+    for category in $undeclared; do
+        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$referenced_rows" | paste -sd ' ' -)"
+        echo "undeclared: $category, referenced by $symbols" >&2
+    done
+    for category in $stale; do
+        echo "stale: $category is declared but never referenced" >&2
+    done
+    [ -z "$undeclared$stale" ]
 
 # Run tests
 test:
