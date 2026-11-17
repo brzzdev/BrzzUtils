@@ -121,7 +121,8 @@ privacy-audit: build-release
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # Apple's required-reason APIs as `nm -u` names them. The getattrlist family reads
+    # Apple's required-reason APIs as `nm -u` names them; Swift's wrappers reference these
+    # same symbols, so none needs its mangled name. The getattrlist family reads
     # timestamps and disk space alike, so it counts towards both categories.
     apis='
     ActiveKeyboards _objc_msgSend$activeInputModes
@@ -156,27 +157,28 @@ privacy-audit: build-release
     UserDefaults _OBJC_CLASS_$_NSUserDefaults
     '
 
-    uses="$(
+    # The rows of the table above whose symbol `nm -u` lists.
+    referenced_apis="$(
         nm -u {{ quote(release_products / "BrzzUtils.o") }} \
             | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$apis")
     )"
-    referenced="$(awk '{ print $1 }' <<<"$uses" | sort -u)"
-    declared="$(
-        plutil -extract NSPrivacyAccessedAPITypes xml1 -o - Sources/BrzzUtils/PrivacyInfo.xcprivacy \
-            | sed -n 's|.*<string>NSPrivacyAccessedAPICategory\(.*\)</string>.*|\1|p' \
+    referenced_categories="$(awk '{ print $1 }' <<<"$referenced_apis" | sort -u)"
+    declared_categories="$(
+        plutil -p Sources/BrzzUtils/PrivacyInfo.xcprivacy \
+            | sed -n 's|.*"NSPrivacyAccessedAPIType" => "NSPrivacyAccessedAPICategory\(.*\)"|\1|p' \
             | sort -u
     )"
 
-    undeclared="$(comm -23 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared"))"
-    stale="$(comm -13 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared"))"
+    undeclared="$(comm -23 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
+    stale="$(comm -13 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
     for category in $undeclared; do
-        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$uses" | paste -sd ' ' -)"
+        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$referenced_apis" | paste -sd ' ' -)"
         echo "undeclared: $category, referenced by $symbols" >&2
     done
     for category in $stale; do
         echo "stale: $category is declared but never referenced" >&2
     done
-    [[ -z "$undeclared$stale" ]]
+    [ -z "$undeclared$stale" ]
 
 # Run tests
 test:
