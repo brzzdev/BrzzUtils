@@ -160,27 +160,25 @@ privacy-audit: build-release
     '
 
     # awk reads the `nm -u` symbols first, then keeps each table row whose symbol is among them.
-    referenced_apis="$(
+    referenced_rows="$(
         nm -u {{ quote(release_products / "BrzzUtils.o") }} \
             | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$required_reason_symbols")
     )"
-    referenced_categories="$(awk '{ print $1 }' <<<"$referenced_apis" | sort -u)"
+    referenced_categories="$(awk '{ print $1 }' <<<"$referenced_rows" | sort -u)"
 
     manifest=Sources/BrzzUtils/PrivacyInfo.xcprivacy
-    plutil -lint -s "$manifest"
+    count="$(plutil -extract NSPrivacyAccessedAPITypes raw -expect array -o - "$manifest")"
+    # `set -e` doesn't reach inside the substitution, so a failed entry exits it explicitly.
     declared_categories="$(
-        if [ "$(plutil -type NSPrivacyAccessedAPITypes "$manifest" 2>/dev/null)" = array ]; then
-            count="$(plutil -extract NSPrivacyAccessedAPITypes raw -o - "$manifest")"
-            for ((i = 0; i < count; i++)); do
-                plutil -extract "NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType" raw -o - "$manifest"
-            done
-        fi | sort -u
+        for ((i = 0; i < count; i++)); do
+            plutil -extract "NSPrivacyAccessedAPITypes.$i.NSPrivacyAccessedAPIType" raw -expect string -o - "$manifest" || exit
+        done | sort -u
     )"
 
     undeclared="$(comm -23 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
     stale="$(comm -13 <(printf '%s\n' "$referenced_categories") <(printf '%s\n' "$declared_categories"))"
     for category in $undeclared; do
-        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$referenced_apis" | paste -sd ' ' -)"
+        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$referenced_rows" | paste -sd ' ' -)"
         echo "undeclared: $category, referenced by $symbols" >&2
     done
     for category in $stale; do
