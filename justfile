@@ -2,6 +2,7 @@ set default-list
 
 # Xcode's default DerivedData path is hashed, so its object files have no stable location.
 release_derived_data := ".build/release"
+release_products := justfile_directory() / release_derived_data / "Build/Products/Release"
 scheme := "BrzzUtils-Package"
 
 # Repo-scoped rather than the bare /tmp/swiftformat-base every repo in the family
@@ -26,7 +27,7 @@ build-ios: (build-for "generic/platform=iOS")
 
 # Build the package in Release for macOS, printing where its object files land
 build-release: (build-for "platform=macOS" "-configuration" "Release" "-derivedDataPath" release_derived_data)
-    @echo {{ quote(justfile_directory() / release_derived_data / "Build/Products/Release") }}
+    @echo {{ quote(release_products) }}
 
 # Fetched rather than vendored, but at most once a day: this is a dependency of
 # `format-staged`, which the pre-commit hook runs on every commit, so an
@@ -114,6 +115,70 @@ outdated:
 pre-commit:
     cp .scripts/pre-commit .git/hooks/pre-commit
     chmod +x .git/hooks/pre-commit
+
+# Fail when BrzzUtils' required-reason API categories differ from its privacy manifest's
+privacy-audit: build-release
+    #!/usr/bin/env bash
+    set -euo pipefail
+    export LC_ALL=C
+
+    # Apple's required-reason APIs as `nm -u` names them. The getattrlist family reads
+    # timestamps and disk space alike, so it counts towards both categories.
+    apis='
+    ActiveKeyboards _objc_msgSend$activeInputModes
+    DiskSpace _NSFileSystemFreeSize
+    DiskSpace _NSFileSystemSize
+    DiskSpace _NSURLVolumeAvailableCapacityForImportantUsageKey
+    DiskSpace _NSURLVolumeAvailableCapacityForOpportunisticUsageKey
+    DiskSpace _NSURLVolumeAvailableCapacityKey
+    DiskSpace _NSURLVolumeTotalCapacityKey
+    DiskSpace _fgetattrlist
+    DiskSpace _fstatfs
+    DiskSpace _fstatvfs
+    DiskSpace _getattrlist
+    DiskSpace _getattrlistat
+    DiskSpace _statfs
+    DiskSpace _statvfs
+    FileTimestamp _NSFileCreationDate
+    FileTimestamp _NSFileModificationDate
+    FileTimestamp _NSURLContentModificationDateKey
+    FileTimestamp _NSURLCreationDateKey
+    FileTimestamp _fgetattrlist
+    FileTimestamp _fstat
+    FileTimestamp _fstatat
+    FileTimestamp _getattrlist
+    FileTimestamp _getattrlistat
+    FileTimestamp _getattrlistbulk
+    FileTimestamp _lstat
+    FileTimestamp _objc_msgSend$fileModificationDate
+    FileTimestamp _stat
+    SystemBootTime _mach_absolute_time
+    SystemBootTime _objc_msgSend$systemUptime
+    UserDefaults _OBJC_CLASS_$_NSUserDefaults
+    '
+
+    uses="$(
+        nm -u {{ quote(release_products / "BrzzUtils.o") }} \
+            | awk 'NR == FNR { undefined[$1]; next } $2 in undefined' - <(printf '%s\n' "$apis")
+    )"
+    referenced="$(awk '{ print $1 }' <<<"$uses" | sort -u)"
+    declared="$(
+        plutil -extract NSPrivacyAccessedAPITypes xml1 -o - Sources/BrzzUtils/PrivacyInfo.xcprivacy \
+            | sed -n 's|.*<string>NSPrivacyAccessedAPICategory\(.*\)</string>.*|\1|p' \
+            | sort -u
+    )"
+
+    status=0
+    for category in $(comm -23 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared")); do
+        symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$uses" | paste -sd ' ' -)"
+        echo "undeclared: $category, referenced by $symbols" >&2
+        status=1
+    done
+    for category in $(comm -13 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared")); do
+        echo "stale: $category is declared but never referenced" >&2
+        status=1
+    done
+    exit "$status"
 
 # Run tests
 test:
