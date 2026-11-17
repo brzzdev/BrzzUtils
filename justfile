@@ -120,7 +120,6 @@ pre-commit:
 privacy-audit: build-release
     #!/usr/bin/env bash
     set -euo pipefail
-    export LC_ALL=C
 
     # Apple's required-reason APIs as `nm -u` names them. The getattrlist family reads
     # timestamps and disk space alike, so it counts towards both categories.
@@ -168,17 +167,16 @@ privacy-audit: build-release
             | sort -u
     )"
 
-    status=0
-    for category in $(comm -23 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared")); do
+    undeclared="$(comm -23 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared"))"
+    stale="$(comm -13 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared"))"
+    for category in $undeclared; do
         symbols="$(awk -v category="$category" '$1 == category { print $2 }' <<<"$uses" | paste -sd ' ' -)"
         echo "undeclared: $category, referenced by $symbols" >&2
-        status=1
     done
-    for category in $(comm -13 <(printf '%s\n' "$referenced") <(printf '%s\n' "$declared")); do
+    for category in $stale; do
         echo "stale: $category is declared but never referenced" >&2
-        status=1
     done
-    exit "$status"
+    [[ -z "$undeclared$stale" ]]
 
 # Run tests
 test:
